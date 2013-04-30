@@ -13,22 +13,22 @@
         </layout>
     </appender>
 
-    <appender name="FILE"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>logFile.log</File>
-        <rollingPolicy
-                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>
-                logFile.%d{yyyy-MM-dd_HH-mm}.log.zip
-            </FileNamePattern>
-        </rollingPolicy>
+    <!--<appender name="FILE"-->
+              <!--class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+        <!--<File>logFile.log</File>-->
+        <!--<rollingPolicy-->
+                <!--class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+            <!--<FileNamePattern>-->
+                <!--logFile.%d{yyyy-MM-dd_HH-mm}.log.zip-->
+            <!--</FileNamePattern>-->
+        <!--</rollingPolicy>-->
 
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %d{HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n
-            </Pattern>
-        </layout>
-    </appender>
+        <!--<layout class="ch.qos.logback.classic.PatternLayout">-->
+            <!--<Pattern>-->
+                <!--%d{HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n-->
+            <!--</Pattern>-->
+        <!--</layout>-->
+    <!--</appender>-->
 
     <appender name="LILITH"
               class="ch.qos.logback.classic.net.SocketAppender">
@@ -44,11 +44,29 @@
         </layout>
     </appender>
 
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>logname</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${logname}" class="ch.qos.logback.core.FileAppender">
+                <file>${logname}.log</file>
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <Pattern>
+                        %d{HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n
+                    </Pattern>
+                </layout>
+            </appender>
+        </sift>
+    </appender>
+
     <root>
         <level value="DEBUG"/>
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="LILITH"/>
+        <appender-ref ref="SIFT"/>
+        <!--<appender-ref ref="FILE"/>-->
+        <!--<appender-ref ref="LILITH"/>-->
     </root>
 
     <!--<include file="/tmp/logback-demo.xml"/>-->

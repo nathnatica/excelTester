@@ -9,7 +9,7 @@ public class RowUtil {
     public static final int DATA_START_COLUMN_INDEX = 3;
 
     public static boolean isTableRow(Row row) {
-        return StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), "table");
+        return matchesRowType("table", row);
     }
 
     public static String getTableName(Row row) {
@@ -17,23 +17,35 @@ public class RowUtil {
     }
 
     public static boolean isColumnRow(Row row) {
-        return StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), "column");
+        return matchesRowType("column", row);
     }
 
     public static boolean isTypesRow(Row row) {
-        return StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), "type");
+        return matchesRowType("type", row);
     }
 
     public static boolean isConditionsRow(Row row) {
-        return StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), "condition");
+        return matchesRowType("condition", row);
     }
 
-    public static boolean isDataRow(Row row) {
-        return StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), "i");
+    public static boolean isRecordRow(Row row) {
+        return matchesRowType("i", row);
     }
 
     public static boolean isCountRow(Row row) {
-        return StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), "count");
+        return matchesRowType("count", row);
     }
 
+    private static boolean matchesRowType(String type, Row row) {
+        return row != null && row.getCell(CONTROL_COLUMN_INDEX) != null
+                && StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), type);
+    }
+
+    public static String getRowType(Row row) {
+        if (row != null && row.getCell(CONTROL_COLUMN_INDEX) != null) {
+            return row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue();
+        } else {
+            return null;
+        }
+    }
 }

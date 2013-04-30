@@ -1,17 +1,16 @@
 package com.github.nathnatica;
 
 import com.github.nathnatica.model.ColumnEntity;
-import com.github.nathnatica.model.DataEntity;
+import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
-import com.google.common.collect.RowSortedTable;
 import com.google.common.io.Files;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,8 +40,11 @@ public class ExcelLoader {
         StringBuilder sb = new StringBuilder();
         sb.append(year).append(month < 10?"0"+month:month).append(date<10?"0"+date:date)
                 .append(hour<10?"0"+hour:hour).append(minute<10?"0"+minute:minute).append(second<10?"0"+second:second);
+        String timestamp = sb.toString();
 
-        Files.copy(new File(path), new File(path.replace(".xls","_backup_" + sb.toString() + ".xls")));
+        MDC.put("logname", timestamp + "_" +  path.substring(path.lastIndexOf("\\")+1, path.length()-1)+ "_input");
+
+        Files.copy(new File(path), new File(path.replace(".xls","_backup_" + timestamp + ".xls")));
 
 
         XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(new File(path)));
@@ -59,8 +61,15 @@ public class ExcelLoader {
         }
 
 
-        tables.get(0).getInsertSQL();
 
+        for (TableEntity table : tables) {
+            if (table.records.size() != table.count) {
+                logger.error("count not matching");
+            }
+            table.print();
+            table.getInsertSQL();
+            table.getDeleteSQL();
+        }
     }
 
 
@@ -72,66 +81,68 @@ public class ExcelLoader {
 
         List<TableEntity> tables = new ArrayList<TableEntity>();
         TableEntity table = null;
-        List<ColumnEntity> columns = new ArrayList<ColumnEntity>();
-        List<DataEntity> data = new ArrayList<DataEntity>();
+        List<ColumnEntity> columns = null;
+        List<RecordEntity> records = null;
         int start = -1;
         int end = -1;
         for (int i=first; i<=last; i++) {
-
+            System.out.println(i);
             Row row = sheet.getRow(i);
             if (RowUtil.isTableRow(row)) {
                 logger.debug("table row");
                 table = new TableEntity();
+                columns = new ArrayList<ColumnEntity>();
+                records = new ArrayList<RecordEntity>();
                 table.name = RowUtil.getTableName(row);
             } else if (RowUtil.isColumnRow(row)) {
                 logger.debug("column row");
                 start = RowUtil.DATA_START_COLUMN_INDEX;
                 end = row.getLastCellNum()-1;
                 for (int j=start; j<=end; j++) {
-                    ColumnEntity column = new ColumnEntity();
-                    column.name = row.getCell(j).getStringCellValue();
+                    ColumnEntity column = new ColumnEntity(columns.size());
+                    column.name = row.getCell(j).getStringCellValue().trim();
                     columns.add(column);
                 }
                 table.columns = columns;
             } else if (RowUtil.isTypesRow(row)) {
                 logger.debug("type row");
                 for (int j=0; j<columns.size(); j++) {
-                    columns.get(j).type = row.getCell(j+start).getStringCellValue();
+                    columns.get(j).type = row.getCell(j+start).getStringCellValue().trim();
                 }
             } else if (RowUtil.isConditionsRow(row)) {
                 logger.debug("condition row");
                 for (int j=0; j<columns.size(); j++) {
                     Cell c = row.getCell(j+start);
                     if (c != null) {
-                        columns.get(j).condition = c.getStringCellValue();
+                        columns.get(j).condition = c.getStringCellValue().trim();
                     }
                 }
-            } else if (RowUtil.isDataRow(row)) {
+            } else if (RowUtil.isRecordRow(row)) {
+                RecordEntity record = new RecordEntity();
+                record.columns = columns;
+                record.type = RowUtil.getRowType(row);
+                List<String> values = new ArrayList<String>();
                 logger.debug("data row");
-                DataEntity entity = new DataEntity();
                 for (int j=0; j<columns.size(); j++) {
                     Cell c = row.getCell(j+start);
                     if (c != null) {
-                        entity.value = c.getStringCellValue();
+                        values.add(c.getStringCellValue().trim());
+                    } else {
+                        values.add(null);
                     }
                 }
-                data.add(entity);
-                table.data = data;
+                record.values = values;
+                records.add(record);
             } else if (RowUtil.isCountRow(row)) {
                 logger.debug("count row");
-                table.count = Integer.parseInt(row.getCell(RowUtil.DATA_START_COLUMN_INDEX).getStringCellValue());
+                table.count = Integer.parseInt(row.getCell(RowUtil.DATA_START_COLUMN_INDEX).getStringCellValue().trim());
+                table.records = records;
                 tables.add(table);
                 table = null;
                 columns = null;
-                data = null;
+                records = null;
             }
 
-        }
-
-        for (TableEntity t: tables) {
-            if (t.data.size() != t.count) {
-                logger.error("count not matching");
-            }
         }
     return tables;
     }
