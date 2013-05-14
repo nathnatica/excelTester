@@ -30,19 +30,19 @@
         <!--</layout>-->
     <!--</appender>-->
 
-    <appender name="LILITH"
-              class="ch.qos.logback.classic.net.SocketAppender">
-        <RemoteHost>localhost</RemoteHost>
-        <Port>4560</Port>
-        <ReconnectionDelay>170</ReconnectionDelay>
-        <IncludeCallerData>true</IncludeCallerData>
+    <!--<appender name="LILITH"-->
+              <!--class="ch.qos.logback.classic.net.SocketAppender">-->
+        <!--<RemoteHost>localhost</RemoteHost>-->
+        <!--<Port>4560</Port>-->
+        <!--<ReconnectionDelay>170</ReconnectionDelay>-->
+        <!--<IncludeCallerData>true</IncludeCallerData>-->
 
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %d{HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n
-            </Pattern>
-        </layout>
-    </appender>
+        <!--<layout class="ch.qos.logback.classic.PatternLayout">-->
+            <!--<Pattern>-->
+                <!--%d{HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n-->
+            <!--</Pattern>-->
+        <!--</layout>-->
+    <!--</appender>-->
 
     <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
         <discriminator>

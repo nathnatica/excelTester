@@ -21,37 +21,39 @@ public class ExcelLoader {
     final static Logger logger = LoggerFactory.getLogger(ExcelLoader.class);
 
     public static void main(String[] args) throws IOException {
-//        if (args.length < 2) {
-//            System.out.println("wrong number of arguments");
-//            return;
-//        }
 
-        String path = PropertyUtil.getProperty("file.path");
-//        String path = args[0];
+//        String path = PropertyUtil.getProperty("file.path");
+        String file = null;
+        if (args == null || args.length == 0) {
+            System.out.println("needs argument[0] - excel file name");
+            return;
+        } else {
+            file = args[0];
+        }
 //        String action = args[1];
 
         Calendar c = GregorianCalendar.getInstance();
         int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH)+1;
+        int month = c.get(Calendar.MONTH) + 1;
         int date = c.get(Calendar.DAY_OF_MONTH);
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
         int second = c.get(Calendar.SECOND);
         StringBuilder sb = new StringBuilder();
-        sb.append(year).append(month < 10?"0"+month:month).append(date<10?"0"+date:date)
-                .append(hour<10?"0"+hour:hour).append(minute<10?"0"+minute:minute).append(second<10?"0"+second:second);
+        sb.append(year).append(month < 10 ? "0" + month : month).append(date < 10 ? "0" + date : date)
+                .append(hour < 10 ? "0" + hour : hour).append(minute < 10 ? "0" + minute : minute).append(second < 10 ? "0" + second : second);
         String timestamp = sb.toString();
 
-        MDC.put("logname", timestamp + "_" +  path.substring(path.lastIndexOf("\\")+1, path.length()-1)+ "_input");
+        MDC.put("logname", timestamp + "_" + file.substring(file.lastIndexOf("\\") + 1, file.length() - 1) + "_input");
 
-        Files.copy(new File(path), new File(path.replace(".xls","_backup_" + timestamp + ".xls")));
+        Files.copy(new File(file), new File(file.replace(".xls", "_backup_" + timestamp + ".xls")));
 
 
-        XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(new File(path)));
+        XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(new File(file)));
 
         int sheets = wb.getNumberOfSheets();
         List<TableEntity> tables = null;
-        for (int i=0; i<sheets; i++) {
+        for (int i = 0; i < sheets; i++) {
             if (wb.getSheetAt(i).getSheetName().contains("input")) {
                 logger.debug("read input sheet");
                 tables = readInputSheet(wb.getSheetAt(i));
@@ -59,7 +61,6 @@ public class ExcelLoader {
 
             }
         }
-
 
 
         for (TableEntity table : tables) {
