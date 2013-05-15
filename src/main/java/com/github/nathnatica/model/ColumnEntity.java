@@ -20,13 +20,16 @@ public class ColumnEntity {
             return "?";
         } else if (StringUtils.equalsIgnoreCase("DATE", type)) {
             if (value.matches("[0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{1,2}:[0-9]{2}:[0-9]{2}")) {
-                return "TO_DATE(?, 'YYYY/MM/DD HH:MM:SS')";
+                return "TO_DATE(?, 'YYYY/MM/DD HH24:MI:SS')";
             } else if (value.matches("[0-9]{8}")) {
                 return "TO_DATE(?, 'YYYYMMDD')";
             } else if (value.matches("[0-9]{14}")) {
-                return "TO_DATE(?, 'YYYYMMDDHHMMSS')";
+                return "TO_DATE(?, 'YYYYMMDDHH24MISS')";
+            } else if (StringUtils.isBlank(value)) {
+                return "?";
             } else {
                 throw new IllegalArgumentException(value + " is not supporting DATE format");
+                
             }
         } else if (StringUtils.equalsIgnoreCase("RAW", type)) {
             if (value.matches("[A-Z0-9]+")) {

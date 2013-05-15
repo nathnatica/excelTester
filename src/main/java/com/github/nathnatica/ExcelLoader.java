@@ -63,14 +63,20 @@ public class ExcelLoader {
         }
 
 
+        DAO dao = new DAO();
         for (TableEntity table : tables) {
             if (table.records.size() != table.count) {
                 logger.error("count not matching");
             }
-            table.print();
-            table.getInsertSQL();
-            table.getDeleteSQL();
+//            table.print();
+            logger.debug(table.getInsertSQL());
+//            logger.debug(table.getDeleteSQL());
+            
+            dao.execute(table);
         }
+        
+        
+        
     }
 
 
@@ -87,7 +93,7 @@ public class ExcelLoader {
         int start = -1;
         int end = -1;
         for (int i=first; i<=last; i++) {
-            System.out.println(i);
+//            System.out.println(i);
             Row row = sheet.getRow(i);
             if (RowUtil.isTableRow(row)) {
                 logger.debug("table row");

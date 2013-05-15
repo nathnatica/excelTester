@@ -1,68 +1,101 @@
 package com.github.nathnatica;
 
-import java.sql.DriverManager;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import com.github.nathnatica.model.ColumnEntity;
+import com.github.nathnatica.model.RecordEntity;
+import com.github.nathnatica.model.TableEntity;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.sql.*;
+import java.util.List;
 
 public class DAO {
+    final static Logger logger = LoggerFactory.getLogger(DAO.class);
 
     private static final String DB_DRIVER = PropertyUtil.getProperty("db.driver");
     private static final String DB_CONNECTION = PropertyUtil.getProperty("db.connection");
     private static final String DB_USER = PropertyUtil.getProperty("db.user");
     private static final String DB_PASSWORD = PropertyUtil.getProperty("db.password");
 
-    public static void main(String[] argv) {
+    
+    
+    public void execute(TableEntity table) {
+        Connection conn = getDBConnection();
 
         try {
+            
+            conn.setAutoCommit(false);
+            
+            insertRecordIntoTable(conn, table);
 
-            insertRecordIntoTable();
-
+//            conn.rollback();
+            conn.commit();
         } catch (SQLException e) {
 
             System.out.println(e.getMessage());
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (conn!= null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
     }
 
-    private static void insertRecordIntoTable() throws SQLException {
+    private static void insertRecordIntoTable(Connection dbConnection, TableEntity table) throws Exception {
 
-        Connection dbConnection = null;
         PreparedStatement preparedStatement = null;
 
-        String insertTableSQL = "INSERT INTO DBUSER" + "(USER_ID, USERNAME, CREATED_BY, CREATED_DATE) VALUES" + "(?,?,?,?)";
+        String insertTableSQL = table.getInsertSQL();
 
         try {
-            dbConnection = getDBConnection();
-            preparedStatement = dbConnection.prepareStatement(insertTableSQL);
+            int count = 0;
+            for (RecordEntity r : table.records) {
+                preparedStatement = dbConnection.prepareStatement(insertTableSQL);
+                List<ColumnEntity> cList = r.columns;
+                List<String> vList = r.values;
+                for (int i=0; i<cList.size(); i++) {
+                    ColumnEntity c = cList.get(i);
+                    if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
+                        logger.debug(i + " = " + vList.get(i));
+                        preparedStatement.setString(i+1, vList.get(i));
+                    } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
+                        logger.debug(i + " = " + vList.get(i));
+                        preparedStatement.setBigDecimal(i+1, new BigDecimal(vList.get(i)));
+                    } else if (StringUtils.equalsIgnoreCase("RAW", c.type)) {
+                        logger.debug(i + " = " + vList.get(i));
+                        preparedStatement.setString(i+1, vList.get(i));
+                    } else if (StringUtils.equalsIgnoreCase("DATE", c.type)) {
+                        logger.debug(i + " = " + vList.get(i));
+//                        preparedStatement.setTimestamp(i+1, Timestamp.valueOf(vList.get(i).replace("/", "-")));
+                        preparedStatement.setString(i+1, vList.get(i));
+                    } else {
+                        throw new Exception("wrong column type");
+                    }
+                }
+                count = preparedStatement.executeUpdate();
+            }
 
-            preparedStatement.setInt(1, 11);
-            preparedStatement.setString(2, "XXX");
-            preparedStatement.setString(3, "XXX");
-            preparedStatement.setTimestamp(4, getCurrentTimeStamp());
-
-            // execute insert SQL stetement
-            preparedStatement.executeUpdate();
-
-            System.out.println("Record is inserted into DBUSER table!");
-
+            if (count != table.count) {
+                throw new Exception("wrong number of insertion");   
+            } else {
+                logger.debug(count + " records had been inserted");
+            }
         } catch (SQLException e) {
-
-            System.out.println(e.getMessage());
-
+            logger.debug(e.getMessage());
+        } catch (Exception e) {
+            logger.debug(e.getMessage());
         } finally {
-
             if (preparedStatement != null) {
                 preparedStatement.close();
             }
-
-            if (dbConnection != null) {
-                dbConnection.close();
-            }
-
         }
 
     }
