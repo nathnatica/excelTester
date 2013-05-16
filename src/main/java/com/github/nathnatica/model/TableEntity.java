@@ -1,9 +1,15 @@
 package com.github.nathnatica.model;
 
+import com.github.nathnatica.validator.Argument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 public class TableEntity {
 
+    final static Logger logger = LoggerFactory.getLogger(TableEntity.class);
+    
     public String name;
 
     public List<ColumnEntity> columns;
@@ -12,6 +18,20 @@ public class TableEntity {
 
     public int count;
 
+    public String getSQLfor(Argument.Action action) {
+        if (Argument.Action.INSERT == action) {
+            String sql = getInsertSQL();
+            logger.debug(sql);
+            return sql;    
+        } else if (Argument.Action.DELETE == action) {
+            String sql = getDeleteSQL();
+            logger.debug(sql);
+            return  sql; 
+        }
+        return null;
+    } 
+    
+    
     public String getDeleteSQL() {
         StringBuilder sb = new StringBuilder();
         sb.append("delete from ");
@@ -30,8 +50,6 @@ public class TableEntity {
                 isFirstCondition = false;
             }
         }
-
-        System.out.println(sb.toString());
         return sb.toString();
     }
 
@@ -58,9 +76,7 @@ public class TableEntity {
                 sb.append(", ");
             }
         }
-
         sb.append(")");
-        System.out.println(sb.toString());
         return sb.toString();
     }
 

@@ -3,6 +3,7 @@ package com.github.nathnatica;
 import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
+import com.github.nathnatica.validator.Argument;
 import com.google.common.io.Files;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,15 +23,8 @@ public class ExcelLoader {
 
     public static void main(String[] args) throws IOException {
 
-//        String path = PropertyUtil.getProperty("file.path");
-        String file = null;
-        if (args == null || args.length == 0) {
-            System.out.println("needs argument[0] - excel file name");
-            return;
-        } else {
-            file = args[0];
-        }
-//        String action = args[1];
+        if (!Argument.validate(args)) return;
+
 
         Calendar c = GregorianCalendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -44,6 +38,7 @@ public class ExcelLoader {
                 .append(hour < 10 ? "0" + hour : hour).append(minute < 10 ? "0" + minute : minute).append(second < 10 ? "0" + second : second);
         String timestamp = sb.toString();
 
+        String file = args[0];
         MDC.put("logname", timestamp + "_" + file.substring(file.lastIndexOf("\\") + 1, file.length() - 1) + "_input");
 
         Files.copy(new File(file), new File(file.replace(".xls", "_backup_" + timestamp + ".xls")));
@@ -62,23 +57,30 @@ public class ExcelLoader {
             }
         }
 
+        if (tables == null || tables.size() == 0) {
+            logger.error("input table information is empty");
+            return;
+        }
+        for (TableEntity table : tables) {
+            if (table.records.size() == 0) {
+                logger.error(table.name + " table's record size is 0");
+                return;
+            }
+            if (table.count == 0) {
+                logger.error(table.name + " table's count is 0");
+                return;
+            }
+            if (table.records.size() != table.count) {
+                logger.error(table.name + " table's size and count are not matching");
+                return;
+            }
+        }
 
         DAO dao = new DAO();
-        for (TableEntity table : tables) {
-            if (table.records.size() != table.count) {
-                logger.error("count not matching");
-            }
-//            table.print();
-            logger.debug(table.getInsertSQL());
 //            logger.debug(table.getDeleteSQL());
-            
-            dao.execute(table);
-        }
-        
-        
+        dao.execute(tables, Argument.action);
         
     }
-
 
 
     private static List<TableEntity> readInputSheet(Sheet sheet) {

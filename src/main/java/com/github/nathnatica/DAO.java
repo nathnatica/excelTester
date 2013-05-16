@@ -3,6 +3,7 @@ package com.github.nathnatica;
 import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
+import com.github.nathnatica.validator.Argument;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,23 +22,31 @@ public class DAO {
 
     
     
-    public void execute(TableEntity table) {
+    public void execute(List<TableEntity> tables, Argument.Action action) {
         Connection conn = getDBConnection();
 
         try {
-            
             conn.setAutoCommit(false);
-            
-            insertRecordIntoTable(conn, table);
-
+                
+            for (TableEntity table : tables) {
+                insertRecordIntoTable(conn, table, action);
+            }
 //            conn.rollback();
             conn.commit();
         } catch (SQLException e) {
-
-            System.out.println(e.getMessage());
-
+            logger.debug(e.getMessage());
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
         } finally {
             if (conn!= null) {
                 try {
@@ -49,38 +58,28 @@ public class DAO {
         }
     }
 
-    private static void insertRecordIntoTable(Connection dbConnection, TableEntity table) throws Exception {
+    private static void insertRecordIntoTable(Connection dbConnection, TableEntity table, Argument.Action action) throws Exception {
 
         PreparedStatement preparedStatement = null;
 
-        String insertTableSQL = table.getInsertSQL();
+        String sql = table.getSQLfor(action);
 
         try {
             int count = 0;
             for (RecordEntity r : table.records) {
-                preparedStatement = dbConnection.prepareStatement(insertTableSQL);
-                List<ColumnEntity> cList = r.columns;
-                List<String> vList = r.values;
-                for (int i=0; i<cList.size(); i++) {
-                    ColumnEntity c = cList.get(i);
-                    if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
-                        logger.debug(i + " = " + vList.get(i));
-                        preparedStatement.setString(i+1, vList.get(i));
-                    } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
-                        logger.debug(i + " = " + vList.get(i));
-                        preparedStatement.setBigDecimal(i+1, new BigDecimal(vList.get(i)));
-                    } else if (StringUtils.equalsIgnoreCase("RAW", c.type)) {
-                        logger.debug(i + " = " + vList.get(i));
-                        preparedStatement.setString(i+1, vList.get(i));
-                    } else if (StringUtils.equalsIgnoreCase("DATE", c.type)) {
-                        logger.debug(i + " = " + vList.get(i));
-//                        preparedStatement.setTimestamp(i+1, Timestamp.valueOf(vList.get(i).replace("/", "-")));
-                        preparedStatement.setString(i+1, vList.get(i));
-                    } else {
-                        throw new Exception("wrong column type");
-                    }
+                preparedStatement = dbConnection.prepareStatement(sql);
+                boolean hasRecord = false;
+                if (action == Argument.Action.INSERT) {
+                    hasRecord = fillInsetSQL(preparedStatement, r);
+                } else if (action == Argument.Action.DELETE) {
+                    hasRecord = fillDeleteSQL(preparedStatement, r);
+                } else {
+                    throw new Exception("wrong action in DAO");
+                } 
+                
+                if (hasRecord) {
+                    count += preparedStatement.executeUpdate();
                 }
-                count = preparedStatement.executeUpdate();
             }
 
             if (count != table.count) {
@@ -98,6 +97,52 @@ public class DAO {
             }
         }
 
+    }
+
+    private static boolean fillDeleteSQL(PreparedStatement preparedStatement, RecordEntity r) throws Exception {
+        List<ColumnEntity> cList = r.columns;
+        List<String> vList = r.values;
+        for (int i=0; i<cList.size(); i++) {
+            String condition = cList.get(i).condition;
+            ColumnEntity c = cList.get(i);
+            if (StringUtils.equalsIgnoreCase("W", condition)) {
+                if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
+                    logger.debug(i + " = " + vList.get(i));
+                    preparedStatement.setString(i+1, vList.get(i));
+                } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
+                    logger.debug(i + " = " + vList.get(i));
+                    preparedStatement.setBigDecimal(i+1, new BigDecimal(vList.get(i)));
+                } else {
+                    throw new Exception("wrong column type");
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean fillInsetSQL(PreparedStatement preparedStatement, RecordEntity r) throws Exception {
+        List<ColumnEntity> cList = r.columns;
+        List<String> vList = r.values;
+        for (int i=0; i<cList.size(); i++) {
+            ColumnEntity c = cList.get(i);
+            if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
+                logger.debug(i + " = " + vList.get(i));
+                preparedStatement.setString(i+1, vList.get(i));
+            } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
+                logger.debug(i + " = " + vList.get(i));
+                preparedStatement.setBigDecimal(i+1, new BigDecimal(vList.get(i)));
+            } else if (StringUtils.equalsIgnoreCase("RAW", c.type)) {
+                logger.debug(i + " = " + vList.get(i));
+                preparedStatement.setString(i+1, vList.get(i));
+            } else if (StringUtils.equalsIgnoreCase("DATE", c.type)) {
+                logger.debug(i + " = " + vList.get(i));
+//                        preparedStatement.setTimestamp(i+1, Timestamp.valueOf(vList.get(i).replace("/", "-")));
+                preparedStatement.setString(i+1, vList.get(i));
+            } else {
+                throw new Exception("wrong column type");
+            }
+        }
+        return true;
     }
 
     private static Connection getDBConnection() {
