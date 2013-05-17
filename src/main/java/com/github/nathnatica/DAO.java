@@ -4,6 +4,7 @@ import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
 import com.github.nathnatica.validator.Argument;
+import com.github.nathnatica.validator.Fill;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,15 +74,13 @@ public class DAO {
                 preparedStatement = dbConnection.prepareStatement(sql);
                 boolean hasRecord = false;
                 if (action == Argument.Action.INSERT) {
-                    hasRecord = fillInsetSQL(preparedStatement, r);
+                    hasRecord = Fill.fillInsetSQL(preparedStatement, r);
                 } else if (action == Argument.Action.DELETE) {
                     hasRecord = fillDeleteSQL(preparedStatement, r);
                 } else {
                     throw new Exception("wrong action in DAO");
                 }
 
-                logger.info("hasRecord is");
-                logger.info("hasRecord is {}", hasRecord);
                 if (hasRecord) {
                     count += preparedStatement.executeUpdate();
                 }
@@ -127,30 +126,6 @@ public class DAO {
         return true;
     }
 
-    private static boolean fillInsetSQL(PreparedStatement preparedStatement, RecordEntity r) throws Exception {
-        List<ColumnEntity> cList = r.columns;
-        List<String> vList = r.values;
-        for (int i=0; i<cList.size(); i++) {
-            ColumnEntity c = cList.get(i);
-            if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
-                logger.debug(i + " = " + vList.get(i));
-                preparedStatement.setString(i+1, vList.get(i));
-            } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
-                logger.debug(i + " = " + vList.get(i));
-                preparedStatement.setBigDecimal(i+1, new BigDecimal(vList.get(i)));
-            } else if (StringUtils.equalsIgnoreCase("RAW", c.type)) {
-                logger.debug(i + " = " + vList.get(i));
-                preparedStatement.setString(i+1, vList.get(i));
-            } else if (StringUtils.equalsIgnoreCase("DATE", c.type)) {
-                logger.debug(i + " = " + vList.get(i));
-//                        preparedStatement.setTimestamp(i+1, Timestamp.valueOf(vList.get(i).replace("/", "-")));
-                preparedStatement.setString(i+1, vList.get(i));
-            } else {
-                throw new Exception("wrong column type");
-            }
-        }
-        return true;
-    }
 
     private static Connection getDBConnection() {
         Connection dbConnection = null;
