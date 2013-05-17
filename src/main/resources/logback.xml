@@ -61,9 +61,21 @@
         </sift>
     </appender>
 
+    <logger name="com.github.nathnatica">
+        <!--<level value="INFO">-->
+            <!--<appender-ref ref="STDOUT"/>-->
+        <!--</level>-->
+        <!--<level value="DEBUG">-->
+            <!--<appender-ref ref="SIFT"/>-->
+        <!--</level>-->
+        
+        <level value="DEBUG" />
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="SIFT"/>
+    </logger>
+
     <root>
         <level value="DEBUG"/>
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="SIFT"/>
         <!--<appender-ref ref="FILE"/>-->
         <!--<appender-ref ref="LILITH"/>-->

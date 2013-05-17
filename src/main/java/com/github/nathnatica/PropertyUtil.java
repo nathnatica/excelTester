@@ -30,6 +30,13 @@ public class PropertyUtil {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         InputStream stream = loader.getResourceAsStream("application.properties");
         prop.load(stream);
+
+        Properties prop2 = new Properties();
+        stream = loader.getResourceAsStream("db.properties");
+        prop2.load(stream);
+               
+        prop.putAll(prop2);
+                
         instance = prop;
     }
 }

@@ -23,6 +23,8 @@ public class ColumnEntity {
                 return "TO_DATE(?, 'YYYY/MM/DD HH24:MI:SS')";
             } else if (value.matches("[0-9]{8}")) {
                 return "TO_DATE(?, 'YYYYMMDD')";
+            } else if (value.matches("[0-9]{4}/[0-9]{2}/[0-9]{2}")) {
+                return "TO_DATE(?, 'YYYY/MM/DD')";
             } else if (value.matches("[0-9]{14}")) {
                 return "TO_DATE(?, 'YYYYMMDDHH24MISS')";
             } else if (StringUtils.isBlank(value)) {

@@ -33,10 +33,12 @@ public class DAO {
             }
 //            conn.rollback();
             conn.commit();
+            logger.info("commited");
         } catch (SQLException e) {
             logger.debug(e.getMessage());
             try {
                 conn.rollback();
+                logger.error("rollbacked") ;
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
@@ -44,6 +46,7 @@ public class DAO {
             e.printStackTrace();
             try {
                 conn.rollback();
+                logger.error("rollbacked");
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
@@ -75,17 +78,20 @@ public class DAO {
                     hasRecord = fillDeleteSQL(preparedStatement, r);
                 } else {
                     throw new Exception("wrong action in DAO");
-                } 
-                
+                }
+
+                logger.info("hasRecord is");
+                logger.info("hasRecord is {}", hasRecord);
                 if (hasRecord) {
                     count += preparedStatement.executeUpdate();
                 }
             }
 
             if (count != table.count) {
+                logger.error("for table {}, expect {} records {}ed, but actual {} records", new Object[] {table.name, table.count, action, count}) ;
                 throw new Exception("wrong number of insertion");   
             } else {
-                logger.debug(count + " records had been inserted");
+                logger.info("for table {}, {} records had been [{}]ed", new Object[] {table.name, count, action});
             }
         } catch (SQLException e) {
             logger.debug(e.getMessage());
@@ -102,16 +108,17 @@ public class DAO {
     private static boolean fillDeleteSQL(PreparedStatement preparedStatement, RecordEntity r) throws Exception {
         List<ColumnEntity> cList = r.columns;
         List<String> vList = r.values;
+        int sqlParamIndex = 0;
         for (int i=0; i<cList.size(); i++) {
             String condition = cList.get(i).condition;
             ColumnEntity c = cList.get(i);
             if (StringUtils.equalsIgnoreCase("W", condition)) {
                 if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
                     logger.debug(i + " = " + vList.get(i));
-                    preparedStatement.setString(i+1, vList.get(i));
+                    preparedStatement.setString(++sqlParamIndex, vList.get(i));
                 } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
                     logger.debug(i + " = " + vList.get(i));
-                    preparedStatement.setBigDecimal(i+1, new BigDecimal(vList.get(i)));
+                    preparedStatement.setBigDecimal(++sqlParamIndex, new BigDecimal(vList.get(i)));
                 } else {
                     throw new Exception("wrong column type");
                 }
