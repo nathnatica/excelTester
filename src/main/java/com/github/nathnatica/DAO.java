@@ -76,7 +76,7 @@ public class DAO {
                 if (action == Argument.Action.INSERT) {
                     hasRecord = Fill.fillInsetSQL(preparedStatement, r);
                 } else if (action == Argument.Action.DELETE) {
-                    hasRecord = fillDeleteSQL(preparedStatement, r);
+                    hasRecord = Fill.fillDeleteSQL(preparedStatement, r);
                 } else {
                     throw new Exception("wrong action in DAO");
                 }
@@ -104,27 +104,6 @@ public class DAO {
 
     }
 
-    private static boolean fillDeleteSQL(PreparedStatement preparedStatement, RecordEntity r) throws Exception {
-        List<ColumnEntity> cList = r.columns;
-        List<String> vList = r.values;
-        int sqlParamIndex = 0;
-        for (int i=0; i<cList.size(); i++) {
-            String condition = cList.get(i).condition;
-            ColumnEntity c = cList.get(i);
-            if (StringUtils.equalsIgnoreCase("W", condition)) {
-                if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
-                    logger.debug(i + " = " + vList.get(i));
-                    preparedStatement.setString(++sqlParamIndex, vList.get(i));
-                } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
-                    logger.debug(i + " = " + vList.get(i));
-                    preparedStatement.setBigDecimal(++sqlParamIndex, new BigDecimal(vList.get(i)));
-                } else {
-                    throw new Exception("wrong column type");
-                }
-            }
-        }
-        return true;
-    }
 
 
     private static Connection getDBConnection() {
