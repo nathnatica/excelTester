@@ -61,6 +61,7 @@ public class ExcelLoader {
     }
 
     private static Map loadTableDef() throws Exception {
+        System.out.println(PropertyUtil.getProperty("use.table.def.file"));
         if (StringUtils.equalsIgnoreCase(PropertyUtil.getProperty("use.table.def.file"), "true")) {
             String file = PropertyUtil.getProperty("table.def.file.path");
             XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(new File(file)));
