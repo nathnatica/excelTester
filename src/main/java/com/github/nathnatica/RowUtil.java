@@ -5,8 +5,8 @@ import org.apache.poi.ss.usermodel.Row;
 
 public class RowUtil {
 
-    public static final int CONTROL_COLUMN_INDEX = 1;
-    public static final int DATA_START_COLUMN_INDEX = 3;
+    public static final int CONTROL_COLUMN_INDEX = 1; // in excel file
+    public static final int DATA_START_COLUMN_INDEX = 3; // in excel file
 
     public static boolean isTableRow(Row row) {
         return matchesRowType("table", row);
