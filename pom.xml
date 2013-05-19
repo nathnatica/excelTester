@@ -21,6 +21,7 @@
                 </os>
             </activation>
             <properties>
+                <env>test</env>
                 <use.table.def.file>true</use.table.def.file>
                 <db.driver>oracle.jdbc.OracleDriver</db.driver>
                 <db.connection>KKKKKKKKKKKKK</db.connection>
@@ -36,6 +37,7 @@
                 </os>
             </activation>
             <properties>
+                <env>dev</env>
                 <use.table.def.file>false</use.table.def.file>
                 <db.driver>org.sqlite.JDBC</db.driver>
                 <db.connection>jdbc:sqlite:///Users/nath/work/excelTester/dev.sqlite</db.connection>
@@ -124,6 +126,11 @@
             <version>3.7.2</version>
         </dependency>
         
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>3.1.0.RELEASE</version>
+        </dependency>
     </dependencies>
 
     <build>

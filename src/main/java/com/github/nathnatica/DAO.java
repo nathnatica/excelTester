@@ -1,16 +1,19 @@
 package com.github.nathnatica;
 
-import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
 import com.github.nathnatica.validator.Argument;
-import com.github.nathnatica.validator.Fill;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 public class DAO {
@@ -21,9 +24,15 @@ public class DAO {
     private static final String DB_USER = PropertyUtil.getProperty("db.user");
     private static final String DB_PASSWORD = PropertyUtil.getProperty("db.password");
 
-    
+    private IDAO dao;
     
     public void execute(List<TableEntity> tables, Argument.Action action) {
+        
+        System.setProperty("spring.profiles.active", PropertyUtil.getProperty("env"));
+        ApplicationContext context = new ClassPathXmlApplicationContext("springBeans.xml");
+        logger.info("Active spring profiles : {}", Arrays.toString(context.getEnvironment().getActiveProfiles()));
+      	dao = (IDAO) context.getBean("dao"); 
+        
         Connection conn = getDBConnection();
 
         try {
@@ -62,24 +71,26 @@ public class DAO {
         }
     }
 
-    private static void insertRecordIntoTable(Connection dbConnection, TableEntity table, Argument.Action action) throws Exception {
+    private void insertRecordIntoTable(Connection dbConnection, TableEntity table, Argument.Action action) throws Exception {
 
         PreparedStatement preparedStatement = null;
 
-        String sql = table.getSQLfor(action);
+//        String sql = table.getSQLfor(action);
+        String sql = dao.getSqlFor(table, action);
 
         try {
             int count = 0;
             for (RecordEntity r : table.records) {
                 preparedStatement = dbConnection.prepareStatement(sql);
-                boolean hasRecord = false;
-                if (action == Argument.Action.INSERT) {
-                    hasRecord = Fill.fillInsetSQL(preparedStatement, r);
-                } else if (action == Argument.Action.DELETE) {
-                    hasRecord = Fill.fillDeleteSQL(preparedStatement, r);
-                } else {
-                    throw new Exception("wrong action in DAO");
-                }
+//                boolean hasRecord = false;
+//                if (action == Argument.Action.INSERT) {
+//                    hasRecord = Fill.fillInsetSQL(preparedStatement, r);
+//                } else if (action == Argument.Action.DELETE) {
+//                    hasRecord = Fill.fillDeleteSQL(preparedStatement, r);
+//                } else {
+//                    throw new Exception("wrong action in DAO");
+//                }
+                boolean hasRecord = dao.fillSql(preparedStatement, r, action);
 
                 if (hasRecord) {
                     count += preparedStatement.executeUpdate();
