@@ -24,9 +24,9 @@
                 <env>test</env>
                 <use.table.def.file>true</use.table.def.file>
                 <db.driver>oracle.jdbc.OracleDriver</db.driver>
-                <db.connection>KKKKKKKKKKKKK</db.connection>
-                <db.user>ORA</db.user>
-                <db.password>ORA</db.password>
+                <db.connection>jdbc:oracle:thin:@10.209.25.114:1522/devgdsdb</db.connection>
+                <db.user>GDSUKCRS_UTORA</db.user>
+                <db.password>GDSUKCRS_UTORA</db.password>
             </properties>
         </profile>
         <profile>
@@ -182,6 +182,12 @@
                         <phase>none</phase>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>    
+                </configuration>
             </plugin>
         </plugins>
     </build>
