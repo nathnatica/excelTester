@@ -8,7 +8,8 @@ public class ColumnEntity {
     public String name;
     public String type;
     public String condition;
-
+    public String check;
+    
     public ColumnEntity(int index) {
         this.index = index;
     }

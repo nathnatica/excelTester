@@ -32,6 +32,18 @@ public class RowUtil {
         return matchesRowType("i", row);
     }
 
+    public static boolean isCheckRow(Row row) {
+        return matchesRowType("c", row);
+    }
+    public static boolean isExpectRow(Row row) {
+        return matchesRowType("e", row);
+    }
+    public static boolean isActualRow(Row row) {
+        return matchesRowType("a", row);
+    }
+    public static boolean isResultRow(Row row) {
+        return matchesRowType("r", row);
+    }
     public static boolean isCountRow(Row row) {
         return matchesRowType("count", row);
     }

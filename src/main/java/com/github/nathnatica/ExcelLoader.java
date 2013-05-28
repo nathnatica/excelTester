@@ -47,7 +47,7 @@ public class ExcelLoader {
                 tables = readInputSheet(wb.getSheetAt(i));
             } else if (Argument.isCheckAction() && wb.getSheetAt(i).getSheetName().contains("check")) {
                 logger.debug("read check sheet");
-                // TODO
+                tables = readCheckSheet(wb.getSheetAt(i));
             }
         }
 
@@ -58,6 +58,103 @@ public class ExcelLoader {
         
     }
 
+    private static List<TableEntity> readCheckSheet(Sheet sheet) {
+        int first = sheet.getFirstRowNum();
+        int last = sheet.getLastRowNum();
+
+        List<TableEntity> tables = new ArrayList<TableEntity>();
+        TableEntity table = null;
+        List<ColumnEntity> columns = null;
+        List<RecordEntity> records = null;
+        int start = -1;
+        int end = -1;
+        boolean isTargetTable = false;
+        for (int i=first; i<=last; i++) {
+            Row row = sheet.getRow(i);
+            if (RowUtil.isTableRow(row)) {
+                table = new TableEntity();
+                columns = new ArrayList<ColumnEntity>();
+                records = new ArrayList<RecordEntity>();
+                table.name = capitalize(RowUtil.getTableName(row));
+                isTargetTable = true;
+            } else if (RowUtil.isColumnRow(row) && isTargetTable) {
+                start = RowUtil.DATA_START_COLUMN_INDEX;
+                end = row.getLastCellNum()-1;
+                for (int j=start; j<=end; j++) {
+                    ColumnEntity column = new ColumnEntity(columns.size());
+                    column.name = capitalize(row.getCell(j).getStringCellValue().trim());
+                    columns.add(column);
+                }
+                table.columns = columns;
+
+                // fill type and condtion info from talbe def excel file
+                if (StringUtils.equalsIgnoreCase(PropertyUtil.getProperty("use.table.def.file"), "true")) {
+                    for (ColumnEntity column : columns) {
+                        String key = table.name + "" + column.name;
+                        if (!tableDef.containsKey(key)) {
+                            logger.error("{} is not existing in table definition map", key);
+                        }
+                        if (tableDef.get(key) == null) {
+                            logger.error("value of {} is null in table definition map", key);
+                        }
+                        TableDefEntity def = tableDef.get(key);
+                        if (def.isAccectableType()) {
+                            column.type = def.getType();
+                        }
+                        if (def.isPk()) {
+                            column.condition = "W";
+                        }
+                    }
+                }
+
+            } else if (RowUtil.isTypesRow(row) && isTargetTable) {
+                for (int j=0; j<columns.size(); j++) {
+                    columns.get(j).type = row.getCell(j+start).getStringCellValue().trim();
+                }
+            } else if (RowUtil.isConditionsRow(row) && isTargetTable) {
+                for (int j=0; j<columns.size(); j++) {
+                    Cell c = row.getCell(j+start);
+                    if (c != null) {
+                        columns.get(j).condition = c.getStringCellValue().trim();
+                    }
+                }
+            // add for check feature   
+            } else if (RowUtil.isCheckRow(row) && isTargetTable) {
+                for (int j=0; j<columns.size(); j++) {
+                    Cell c = row.getCell(j+start);
+                    if (c != null) {
+                        columns.get(j).check = c.getStringCellValue().trim();
+                    }
+                }
+            // add for check feature   
+            } else if (RowUtil.isRecordRow(row) && isTargetTable) {
+                RecordEntity record = new RecordEntity();
+                record.columns = columns;
+                record.type = RowUtil.getRowType(row);
+                List<String> values = new ArrayList<String>();
+                for (int j=0; j<columns.size(); j++) {
+                    Cell c = row.getCell(j+start);
+                    if (c != null) {
+                        values.add(c.getStringCellValue().trim());
+                    } else {
+                        values.add(null);
+                    }
+                }
+                record.values = values;
+                records.add(record);
+            } else if (RowUtil.isCountRow(row) && isTargetTable) {
+                table.count = Integer.parseInt(row.getCell(RowUtil.DATA_START_COLUMN_INDEX).getStringCellValue().trim());
+                table.records = records;
+                tables.add(table);
+                table = null;
+                columns = null;
+                records = null;
+                isTargetTable = false;
+            }
+            
+        }
+        return tables;
+    }
 
 
     private static String getYYYYMMDDHH24MISS() {
@@ -77,7 +174,6 @@ public class ExcelLoader {
     private static List<TableEntity> readInputSheet(Sheet sheet) {
         int first = sheet.getFirstRowNum();
         int last = sheet.getLastRowNum();
-
 
         List<TableEntity> tables = new ArrayList<TableEntity>();
         TableEntity table = null;
