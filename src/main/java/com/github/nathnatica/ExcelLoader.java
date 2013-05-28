@@ -42,10 +42,11 @@ public class ExcelLoader {
         int sheets = wb.getNumberOfSheets();
         List<TableEntity> tables = null;
         for (int i = 0; i < sheets; i++) {
-            if (wb.getSheetAt(i).getSheetName().contains("input")) {
+            if ((Argument.isInsertAction() || Argument.isDeleteAction()) && wb.getSheetAt(i).getSheetName().contains("input")) {
                 logger.debug("read input sheet");
                 tables = readInputSheet(wb.getSheetAt(i));
-            } else if (wb.getSheetAt(i).getSheetName().contains("check")) {
+            } else if (Argument.isCheckAction() && wb.getSheetAt(i).getSheetName().contains("check")) {
+                logger.debug("read check sheet");
                 // TODO
             }
         }
