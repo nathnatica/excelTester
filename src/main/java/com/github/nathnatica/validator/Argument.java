@@ -5,7 +5,18 @@ import org.apache.commons.lang3.StringUtils;
 public class Argument {
 
     public enum Action {
-        INSERT, DELETE, CHECK
+        INSERT("insert"),
+        DELETE("delete"),
+        CHECK("check");
+
+        private String value;
+        
+        Action(String value) {
+            this.value = value;    
+        }
+        public String getValue() {
+            return value;
+        }
     }
     
     public static Action action = Action.INSERT;

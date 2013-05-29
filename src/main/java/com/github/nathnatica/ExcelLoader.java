@@ -31,7 +31,7 @@ public class ExcelLoader {
 
         String file = args[0];
         String timestamp = getYYYYMMDDHH24MISS();
-        MDC.put("logname", timestamp + "_" + file.substring(file.lastIndexOf("\\") + 1, file.length() - 1) + "_input");
+        MDC.put("logname", timestamp + "_" + file.substring(file.lastIndexOf("\\") + 1, file.length() - 1) + "_" + Argument.action.getValue());
 
         Files.copy(new File(file), new File(file.replace(".xls", "_backup_" + timestamp + ".xls")));
 
