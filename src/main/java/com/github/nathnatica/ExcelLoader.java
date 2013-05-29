@@ -5,10 +5,10 @@ import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableDefEntity;
 import com.github.nathnatica.model.TableEntity;
 import com.github.nathnatica.util.ExcelUtil;
+import com.github.nathnatica.util.StrUtil;
 import com.github.nathnatica.util.TimeUtil;
 import com.github.nathnatica.validator.Argument;
 import com.github.nathnatica.validator.InputData;
-import com.google.common.base.CaseFormat;
 import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -99,14 +99,14 @@ public class ExcelLoader {
                 table = new TableEntity();
                 columns = new ArrayList<ColumnEntity>();
                 records = new ArrayList<RecordEntity>();
-                table.name = capitalize(RowUtil.getTableName(row));
+                table.name = StrUtil.capitalize(RowUtil.getTableName(row));
                 isTargetTable = true;
             } else if (RowUtil.isColumnRow(row) && isTargetTable) {
                 start = RowUtil.DATA_START_COLUMN_INDEX;
                 end = row.getLastCellNum()-1;
                 for (int j=start; j<=end; j++) {
                     ColumnEntity column = new ColumnEntity(columns.size());
-                    column.name = capitalize(row.getCell(j).getStringCellValue().trim());
+                    column.name = StrUtil.capitalize(row.getCell(j).getStringCellValue().trim());
                     columns.add(column);
                 }
                 table.columns = columns;
@@ -213,14 +213,14 @@ public class ExcelLoader {
                 table = new TableEntity();
                 columns = new ArrayList<ColumnEntity>();
                 records = new ArrayList<RecordEntity>();
-                table.name = capitalize(RowUtil.getTableName(row));
+                table.name = StrUtil.capitalize(RowUtil.getTableName(row));
                 isTargetTable = true;
             } else if (RowUtil.isColumnRow(row) && isTargetTable) {
                 start = RowUtil.DATA_START_COLUMN_INDEX;
                 end = row.getLastCellNum()-1;
                 for (int j=start; j<=end; j++) {
                     ColumnEntity column = new ColumnEntity(columns.size());
-                    column.name = capitalize(row.getCell(j).getStringCellValue().trim());
+                    column.name = StrUtil.capitalize(row.getCell(j).getStringCellValue().trim());
                     columns.add(column);
                 }
                 table.columns = columns;
@@ -284,9 +284,5 @@ public class ExcelLoader {
         }
     return tables;
     }
-    
-    private static String capitalize(String input) {
-        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, input);
-    }
-    
+
 }

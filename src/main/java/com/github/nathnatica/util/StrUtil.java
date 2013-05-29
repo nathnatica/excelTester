@@ -1,11 +1,9 @@
 package com.github.nathnatica.util;
 
-/**
- * Created with IntelliJ IDEA.
- * User: nath
- * Date: 13. 5. 29.
- * Time: 오후 11:46
- * To change this template use File | Settings | File Templates.
- */
+import com.google.common.base.CaseFormat;
+
 public class StrUtil {
+    public static String capitalize(String input) {
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, input);
+    }
 }
