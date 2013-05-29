@@ -10,8 +10,12 @@ public class Argument {
     
     public static Action action = Action.INSERT;
     
-    public static boolean validate(String[] args) {
+    public static boolean isValid(String[] args) {
         if (args == null || args.length == 0) {
+            System.out.println("needs argument[0] - excel file name");
+            return false;
+        }
+        if (!args[0].contains(".xls")) {
             System.out.println("needs argument[0] - excel file name");
             return false;
         }

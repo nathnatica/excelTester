@@ -4,12 +4,14 @@ import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
 import com.github.nathnatica.validator.Argument;
+import com.google.common.base.Joiner;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 public class DAOImpl implements IDAO {
@@ -25,8 +27,47 @@ public class DAOImpl implements IDAO {
             String sql = getDeleteSQL(table);
             logger.debug(sql);
             return  sql;
+        } else if (Argument.Action.CHECK == action) {
+            String sql = getSelectSQL(table);
+            logger.debug(sql);
+            return  sql;
         }
         return null;
+    }
+
+    private String getSelectSQL(TableEntity table) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("select ");
+        boolean isFirstColumn = true;
+        for (int i=0; i<table.columns.size(); i++) {
+            ColumnEntity column = table.columns.get(i);
+            if (!isFirstColumn) {
+                sb.append(",");
+            }
+            if (column.type.equalsIgnoreCase("RAW")) {
+                sb.append("gldecrypt(").append(column.name).append(")");
+            } else {
+                sb.append(column.name);
+            }
+            isFirstColumn = false;
+        }
+        sb.append(" from ");
+        sb.append(table.name);
+        sb.append(" where ");
+
+        boolean isFirstCondition = true;
+        for (int i=0; i<table.columns.size(); i++) {
+            ColumnEntity column = table.columns.get(i);
+            if (column.condition != null && (column.condition.contains("W") || column.condition.contains("w"))) {
+                if (!isFirstCondition) {
+                    sb.append(" and ");
+                }
+                sb.append(column.getDeleteSQLPart(table.records));
+                sb.append(" = ?");
+                isFirstCondition = false;
+            }
+        }
+        return sb.toString();
     }
 
     @Override
@@ -92,9 +133,33 @@ public class DAOImpl implements IDAO {
             return fillInsertSql(preparedStatement, r);
         } else if (action == Argument.Action.DELETE) {
             return fillDeleteSql(preparedStatement, r);
+        } else if (action == Argument.Action.CHECK) {
+            return fillSelectsql(preparedStatement, r);
         } else {
             throw new Exception("wrong action in DAO");
         }
+    }
+
+    private boolean fillSelectsql(PreparedStatement preparedStatement, RecordEntity r) throws Exception {
+        List<ColumnEntity> cList = r.columns;
+        List<String> vList = r.expecteds;
+        int sqlParamIndex = 0;
+        for (int i=0; i<cList.size(); i++) {
+            String condition = cList.get(i).condition;
+            ColumnEntity c = cList.get(i);
+            if (StringUtils.equalsIgnoreCase("W", condition)) {
+                if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
+                    logger.debug(i + " = " + vList.get(i));
+                    preparedStatement.setString(++sqlParamIndex, vList.get(i));
+                } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
+                    logger.debug(i + " = " + vList.get(i));
+                    preparedStatement.setBigDecimal(++sqlParamIndex, new BigDecimal(vList.get(i)));
+                } else {
+                    throw new Exception("wrong column type");
+                }
+            }
+        }
+        return true;
     }
 
     public String getDeleteSQL(TableEntity table) {

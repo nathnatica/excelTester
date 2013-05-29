@@ -9,4 +9,5 @@ public class RecordEntity {
     public List<String> expecteds;
     public List<String> actuals;
     public List<Boolean> checkResults;
+    public boolean isExisingRecord = false;
 }

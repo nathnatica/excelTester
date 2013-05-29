@@ -27,7 +27,7 @@ public class ExcelLoader {
     
     public static void main(String[] args) throws Exception {
 
-        if (!Argument.validate(args)) return;
+        if (!Argument.isValid(args)) return;
 
         String file = args[0];
         String timestamp = getYYYYMMDDHH24MISS();
@@ -51,11 +51,33 @@ public class ExcelLoader {
             }
         }
 
-        if (InputData.validateInputData(tables)) return;
+        if (!InputData.isValid(tables)) return;
 
         DAO dao = new DAO();
         dao.execute(tables, Argument.action);
         
+        if (Argument.isCheckAction()) {
+            check(tables);
+        }
+    }
+
+    private static void check(List<TableEntity> tables) {
+        for (TableEntity table : tables) {
+            for (RecordEntity record : table.records) {
+                List<String> e = record.expecteds;
+                List<String> a = record.actuals;
+                if (record.isExisingRecord && (e.size() != a.size())) {
+                    logger.error("expected record size and actual size of record of table {} is not maching", table.name);    
+                }
+                for (int i=0; i<e.size(); i++) {
+                    if (StringUtils.equals(e.get(i), a.get(i))) {
+                        logger.debug("expected [{}] and actual [{}]", e.get(i), a.get(i)) ;
+                    } else {
+                        logger.error("expected [{}] but actual [{}]", e.get(i), a.get(i));
+                    }
+                }
+            }
+        }
     }
 
     private static List<TableEntity> readCheckSheet(Sheet sheet) {
@@ -126,6 +148,21 @@ public class ExcelLoader {
                         columns.get(j).check = c.getStringCellValue().trim();
                     }
                 }
+            } else if (RowUtil.isExpectRow(row) && isTargetTable) {
+                RecordEntity record = new RecordEntity();
+                record.columns = columns;
+                record.type = RowUtil.getRowType(row);
+                List<String> values = new ArrayList<String>();
+                for (int j=0; j<columns.size(); j++) {
+                    Cell c = row.getCell(j+start);
+                    if (c != null) {
+                        values.add(c.getStringCellValue().trim());
+                    } else {
+                        values.add(null);
+                    }
+                }
+                record.expecteds= values;
+                records.add(record);
             // add for check feature   
             } else if (RowUtil.isRecordRow(row) && isTargetTable) {
                 RecordEntity record = new RecordEntity();

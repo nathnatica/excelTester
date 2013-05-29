@@ -1,18 +1,18 @@
 package com.github.nathnatica;
 
+import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
 import com.github.nathnatica.validator.Argument;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,7 +39,11 @@ public class DAO {
             conn.setAutoCommit(false);
                 
             for (TableEntity table : tables) {
-                insertRecordIntoTable(conn, table, action);
+                if (Argument.isInsertAction() || Argument.isDeleteAction()) {
+                    insertRecordIntoTable(conn, table, action);
+                } else if (Argument.isCheckAction()) {
+                    selectRecordFromTable(conn, table, action);    
+                }
             }
 //            conn.rollback();
             conn.commit();
@@ -67,6 +71,54 @@ public class DAO {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    private void selectRecordFromTable(Connection dbConnection, TableEntity table, Argument.Action action) throws Exception {
+        PreparedStatement preparedStatement = null;
+
+        String sql = dao.getSqlFor(table, action);
+
+        int count = 0;
+        for (RecordEntity r : table.records) {
+            preparedStatement = dbConnection.prepareStatement(sql);
+
+            boolean hasRecord = dao.fillSql(preparedStatement, r, action);
+            
+            ResultSet rs = null;
+            if (hasRecord) {
+                rs = preparedStatement.executeQuery();
+            }
+            try {
+                if (rs.next()) {
+                    List<ColumnEntity> cList = r.columns;
+                    r.actuals = new ArrayList<String>();
+                    for (int i=0; i<cList.size(); i++) {
+                        ColumnEntity c = cList.get(i);
+                        if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
+                            r.actuals.add(rs.getString(c.name));
+                        } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
+                            r.actuals.add("" + rs.getBigDecimal(c.name));
+                        } else if (StringUtils.equalsIgnoreCase("RAW", c.type)) {
+                            r.actuals.add(rs.getString(c.name));
+                        } else if (StringUtils.equalsIgnoreCase("DATE", c.type)) {
+                            r.actuals.add(rs.getString(c.name));
+                        } else {
+                            throw new Exception("wrong column type");
+                        }
+                    }
+                    r.isExisingRecord = true;
+                    count++;
+                }
+                if (rs.next()) {
+                    logger.error("more than 1 record is selelcted");
+                    throw new Exception();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                rs.close();
             }
         }
     }
