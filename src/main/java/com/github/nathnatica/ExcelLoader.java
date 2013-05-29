@@ -4,6 +4,8 @@ import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableDefEntity;
 import com.github.nathnatica.model.TableEntity;
+import com.github.nathnatica.util.ExcelUtil;
+import com.github.nathnatica.util.TimeUtil;
 import com.github.nathnatica.validator.Argument;
 import com.github.nathnatica.validator.InputData;
 import com.google.common.base.CaseFormat;
@@ -30,7 +32,7 @@ public class ExcelLoader {
         if (!Argument.isValid(args)) return;
 
         String file = args[0];
-        String timestamp = getYYYYMMDDHH24MISS();
+        String timestamp = TimeUtil.getYYYYMMDDHH24MISS();
         MDC.put("logname", timestamp + "_" + file.substring(file.lastIndexOf("\\") + 1, file.length() - 1) + "_" + Argument.action.getValue());
 
         Files.copy(new File(file), new File(file.replace(".xls", "_backup_" + timestamp + ".xls")));
@@ -193,20 +195,6 @@ public class ExcelLoader {
         return tables;
     }
 
-
-    private static String getYYYYMMDDHH24MISS() {
-        Calendar c = GregorianCalendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH) + 1;
-        int date = c.get(Calendar.DAY_OF_MONTH);
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
-        int second = c.get(Calendar.SECOND);
-        StringBuilder sb = new StringBuilder();
-        sb.append(year).append(month < 10 ? "0" + month : month).append(date < 10 ? "0" + date : date)
-                .append(hour < 10 ? "0" + hour : hour).append(minute < 10 ? "0" + minute : minute).append(second < 10 ? "0" + second : second);
-        return sb.toString();
-    }
 
     private static List<TableEntity> readInputSheet(Sheet sheet) {
         int first = sheet.getFirstRowNum();

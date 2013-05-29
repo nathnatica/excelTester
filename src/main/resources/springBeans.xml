@@ -5,9 +5,9 @@
        http://www.springframework.org/schema/beans classpath:xsd/spring-beans-3.1.xsd">
 
     <beans profile="dev">
-        <bean id="dao" class="com.github.nathnatica.DAOImpl" name="dao" />
+        <bean id="sqlMaker" class="com.github.nathnatica.SqlFactory" name="sqlMaker" />
     </beans>
     <beans profile="test">
-        <bean id="dao" class="com.github.nathnatica.DAOImpl" name="dao" />
+        <bean id="sqlMaker" class="com.github.nathnatica.SqlFactory" name="sqlMaker" />
     </beans>
 </beans>

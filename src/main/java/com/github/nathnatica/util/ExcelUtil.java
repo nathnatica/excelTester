@@ -1,4 +1,4 @@
-package com.github.nathnatica;
+package com.github.nathnatica.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
