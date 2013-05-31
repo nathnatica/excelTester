@@ -347,20 +347,22 @@ public class ExcelLoader {
                     if (RowUtil.isTableRow(row)) {
                         targetTable = tables.get(tableIndex++);
                         isTargetTable = true;
-                    } else if (RowUtil.isCheckRow(row) && isTargetTable) {
+                    } else if (RowUtil.isResultRow(row) && isTargetTable) {
                         RecordEntity r = targetTable.records.get(actualRecordIndex++);
                         int start = RowUtil.DATA_START_COLUMN_INDEX;
                         for (int k=0; k<r.actuals.size(); k++) {
                             Cell c = row.getCell(k + start);
-                            if (StringUtils.equals(r.expecteds.get(k + start), r.actuals.get(k + start))) {
+                            if (StringUtils.equals(r.expecteds.get(k), r.actuals.get(k))) {
                                 c.setCellValue("OK");
                                 XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
-                                style.setFillBackgroundColor(new XSSFColor(new java.awt.Color(0, 128, 0)));
+                                style.setFillForegroundColor(new XSSFColor(new java.awt.Color(0, 128, 0)));
+                                style.setFillPattern(CellStyle.SOLID_FOREGROUND);
                                 c.setCellStyle(style);
                             } else {
                                 c.setCellValue("NG");
                                 XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
-                                style.setFillBackgroundColor(new XSSFColor(new java.awt.Color(128, 0, 0)));
+                                style.setFillForegroundColor(new XSSFColor(new java.awt.Color(128, 0, 0)));
+                                style.setFillPattern(CellStyle.SOLID_FOREGROUND);
                                 c.setCellStyle(style);
                             }
                         }
