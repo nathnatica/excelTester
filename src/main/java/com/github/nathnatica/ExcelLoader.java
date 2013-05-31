@@ -11,16 +11,14 @@ import com.github.nathnatica.validator.Argument;
 import com.github.nathnatica.validator.InputData;
 import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -63,7 +61,8 @@ public class ExcelLoader {
         
         if (Argument.isCheckAction()) {
             check(tables);
-            writeCheckResult(tables, wb);
+            writeActuals(tables, wb);
+            writeCheckResults(tables, wb);
             writeFile(wb, file);
         }
     }
@@ -298,7 +297,7 @@ public class ExcelLoader {
     }
 
     
-    private static void writeCheckResult(List<TableEntity> tables, Workbook wb) {
+    private static void writeActuals(List<TableEntity> tables, Workbook wb) {
         int sheets = wb.getNumberOfSheets();
         for (int i = 0; i < sheets; i++) {
             if (wb.getSheetAt(i).getSheetName().contains("check")) {
@@ -321,6 +320,49 @@ public class ExcelLoader {
                         for (int k=0; k<r.actuals.size(); k++) {
                             Cell c = row.getCell(k + start);
                             c.setCellValue(r.actuals.get(k));
+                        }
+                        actualRecordIndex++;
+                    } else if (RowUtil.isCountRow(row) && isTargetTable) {
+                        isTargetTable = false;
+                    }
+                }
+            }
+        }
+    }
+    
+    private static void writeCheckResults(List<TableEntity> tables, Workbook wb) {
+        int sheets = wb.getNumberOfSheets();
+        for (int i = 0; i < sheets; i++) {
+            if (wb.getSheetAt(i).getSheetName().contains("check")) {
+                Sheet sheet = wb.getSheetAt(i);
+                int first = sheet.getFirstRowNum();
+                int last = sheet.getLastRowNum();
+                boolean isTargetTable = false;
+                TableEntity targetTable = null;
+                int tableIndex = 0;
+                int actualRecordIndex = 0;
+                for (int j=first; j<=last; j++) {
+                    Row row = sheet.getRow(j);
+
+                    if (RowUtil.isTableRow(row)) {
+                        targetTable = tables.get(tableIndex++);
+                        isTargetTable = true;
+                    } else if (RowUtil.isCheckRow(row) && isTargetTable) {
+                        RecordEntity r = targetTable.records.get(actualRecordIndex++);
+                        int start = RowUtil.DATA_START_COLUMN_INDEX;
+                        for (int k=0; k<r.actuals.size(); k++) {
+                            Cell c = row.getCell(k + start);
+                            if (StringUtils.equals(r.expecteds.get(k + start), r.actuals.get(k + start))) {
+                                c.setCellValue("OK");
+                                XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
+                                style.setFillBackgroundColor(new XSSFColor(new java.awt.Color(0, 128, 0)));
+                                c.setCellStyle(style);
+                            } else {
+                                c.setCellValue("NG");
+                                XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
+                                style.setFillBackgroundColor(new XSSFColor(new java.awt.Color(128, 0, 0)));
+                                c.setCellStyle(style);
+                            }
                         }
                         actualRecordIndex++;
                     } else if (RowUtil.isCountRow(row) && isTargetTable) {
