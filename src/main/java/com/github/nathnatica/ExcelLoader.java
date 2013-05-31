@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 public class ExcelLoader {
@@ -60,7 +63,16 @@ public class ExcelLoader {
         
         if (Argument.isCheckAction()) {
             check(tables);
+            writeCheckResult(tables, wb);
+            writeFile(wb, file);
         }
+    }
+
+    private static void writeFile(Workbook wb, String file) throws IOException {
+      FileOutputStream fileOut = new FileOutputStream(file);
+      wb.write(fileOut);
+      fileOut.close();
+      logger.info("{} file has been updated", file); 
     }
 
     private static void check(List<TableEntity> tables) {
@@ -283,6 +295,40 @@ public class ExcelLoader {
 
         }
     return tables;
+    }
+
+    
+    private static void writeCheckResult(List<TableEntity> tables, Workbook wb) {
+        int sheets = wb.getNumberOfSheets();
+        for (int i = 0; i < sheets; i++) {
+            if (wb.getSheetAt(i).getSheetName().contains("check")) {
+                Sheet sheet = wb.getSheetAt(i);
+                int first = sheet.getFirstRowNum();
+                int last = sheet.getLastRowNum();
+                boolean isTargetTable = false;
+                TableEntity targetTable = null;
+                int tableIndex = 0;
+                int actualRecordIndex = 0;
+                for (int j=first; j<=last; j++) {
+                    Row row = sheet.getRow(j);
+
+                    if (RowUtil.isTableRow(row)) {
+                        targetTable = tables.get(tableIndex++);
+                        isTargetTable = true;
+                    } else if (RowUtil.isActualRow(row) && isTargetTable) {
+                        RecordEntity r = targetTable.records.get(actualRecordIndex++);
+                        int start = RowUtil.DATA_START_COLUMN_INDEX;
+                        for (int k=0; k<r.actuals.size(); k++) {
+                            Cell c = row.getCell(k + start);
+                            c.setCellValue(r.actuals.get(k));
+                        }
+                        actualRecordIndex++;
+                    } else if (RowUtil.isCountRow(row) && isTargetTable) {
+                        isTargetTable = false;
+                    }
+                }
+            }
+        }
     }
 
 }
