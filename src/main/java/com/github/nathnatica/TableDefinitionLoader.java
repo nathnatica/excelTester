@@ -16,15 +16,17 @@ import java.util.Map;
 
 public class TableDefinitionLoader {
     final static Logger logger = LoggerFactory.getLogger(TableDefinitionLoader.class);
+
+    static Map<String, TableDefEntity> tableDef;
     
-    public static Map<String, TableDefEntity> loadTableDef() throws Exception {
-        if (StringUtils.equalsIgnoreCase(PropertyUtil.getProperty("use.table.def.file"), "true")) {
+    public static void loadTableDef() throws Exception {
+        if (isAvailable() && tableDef == null) {
             String file = PropertyUtil.getProperty("table.def.file.path");
             Workbook wb = ExcelUtil.getWorkbook(file);
 
             Sheet sheet = wb.getSheet(PropertyUtil.getProperty("table.def.sheet.name"));
 
-            Map<String, TableDefEntity> tableDefMap = new HashMap<String, TableDefEntity>();
+            tableDef = new HashMap<String, TableDefEntity>();
 
             int first = sheet.getFirstRowNum();
             int last = sheet.getLastRowNum();
@@ -35,36 +37,57 @@ public class TableDefinitionLoader {
                 String columnName = row.getCell(4).getStringCellValue().replace("'", "").trim();
                 String typeName = row.getCell(9).getStringCellValue().replace("'", "").trim();
                 String pkName = row.getCell(14).getStringCellValue().replace("'", "").trim();
+                
                 if (i == first) {
-
-                    if (!StringUtils.contains(tableName, PropertyUtil.getProperty("table.def.sheet.index.table.name"))) {
-                        logger.error("wrong table definition file coundn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.table.name"));
-                        throw new Exception();
-                    }
-                    if (!StringUtils.contains(columnName, PropertyUtil.getProperty("table.def.sheet.index.column.name"))) {
-                        logger.error("wrong table definition file coundn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.column.name"));
-                        throw new Exception();
-                    }
-                    if (!StringUtils.contains(typeName, PropertyUtil.getProperty("table.def.sheet.index.type.name"))) {
-                        logger.error("wrong table definition file coundn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.type.name"));
-                        throw new Exception();
-                    }
-                    if (!StringUtils.contains(pkName, PropertyUtil.getProperty("table.def.sheet.index.pk.name"))) {
-                        logger.error("wrong table definition file coundn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.pk.name"));
-                        throw new Exception();
-                    }
+                    checkTableDefHeader(tableName, columnName, typeName, pkName);
                 }
 
                 TableDefEntity entity = new TableDefEntity();
-                entity.setType(typeName);
+                entity.setType(ColumnTypeFactory.getColumnType(typeName));
                 entity.setPk(StringUtils.equalsIgnoreCase("Yes", pkName));
 
-                String key = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, tableName) +
-                        "" +  CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, columnName);
-                tableDefMap.put(key, entity);
+                String key = getKey(tableName, columnName);
+                tableDef.put(key, entity);
             }
-            return tableDefMap;
         }
-        return Collections.EMPTY_MAP;
+        tableDef = Collections.EMPTY_MAP;
+    }
+
+    private static void checkTableDefHeader(String tableName, String columnName, String typeName, String pkName) throws Exception {
+        if (!StringUtils.contains(tableName, PropertyUtil.getProperty("table.def.sheet.index.table.name"))) {
+            logger.error("wrong table definition file couldn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.table.name"));
+            throw new Exception();
+        }
+        if (!StringUtils.contains(columnName, PropertyUtil.getProperty("table.def.sheet.index.column.name"))) {
+            logger.error("wrong table definition file couldn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.column.name"));
+            throw new Exception();
+        }
+        if (!StringUtils.contains(typeName, PropertyUtil.getProperty("table.def.sheet.index.type.name"))) {
+            logger.error("wrong table definition file couldn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.type.name"));
+            throw new Exception();
+        }
+        if (!StringUtils.contains(pkName, PropertyUtil.getProperty("table.def.sheet.index.pk.name"))) {
+            logger.error("wrong table definition file couldn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.pk.name"));
+            throw new Exception();
+        }
+    }
+
+    private static String getKey(String tableName, String columnName) {
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, tableName) + "" +  CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, columnName);
+    }
+    
+    public static TableDefEntity get(String tableName, String ColumnName) {
+        String key = getKey(tableName, ColumnName);
+        if (!tableDef.containsKey(key)) {
+            logger.error("{} is not existing in table definition map", key);
+        }
+        if (tableDef.get(key) == null) {
+            logger.error("value of {} is null in table definition map", key);
+        }
+        return tableDef.get(key);
+    }
+
+    public static boolean isAvailable() {
+        return StringUtils.equalsIgnoreCase(PropertyUtil.getProperty("use.table.def.file"), "true");
     }
 }
