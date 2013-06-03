@@ -26,6 +26,11 @@ public class RawColumnType implements IColumnType {
         }
         return c.name;
     }
+    
+    @Override
+    public String getSelectSqlPart(String name) {
+        return "gldecrypt(" + name + ")";
+    }
 
     @Override
     public void fillInsertSql(PreparedStatement preparedStatement, int index, String value) throws Exception {

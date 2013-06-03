@@ -11,6 +11,7 @@ public interface IColumnType {
     
     String getInsertSqlPart(String value);
     String getDeleteSqlPart(ColumnEntity c, List<RecordEntity> records);
+    String getSelectSqlPart(String name);
     void fillInsertSql(PreparedStatement preparedStatement, int index, String value) throws Exception;
     void fillDeleteSql(PreparedStatement preparedStatement, int index, String value) throws Exception;
     void fillSelectSql(PreparedStatement preparedStatement, int index, String value) throws Exception;

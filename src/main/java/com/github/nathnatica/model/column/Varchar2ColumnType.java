@@ -17,6 +17,11 @@ public class Varchar2ColumnType implements IColumnType {
     public String getDeleteSqlPart(ColumnEntity c, List<RecordEntity> records) {
         return c.name;
     }
+    
+    @Override
+    public String getSelectSqlPart(String name) {
+        return name;
+    }
 
     @Override
     public void fillInsertSql(PreparedStatement preparedStatement, int index, String value) throws Exception {

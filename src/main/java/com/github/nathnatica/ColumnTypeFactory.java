@@ -7,9 +7,9 @@ import com.github.nathnatica.model.column.RawColumnType;
 import com.github.nathnatica.model.column.Varchar2ColumnType;
 import org.apache.commons.lang3.StringUtils;
 
-public class ColumnTypeFactory {
+public class ColumnTypeFactory implements IColumnTypeFactory {
     
-    public static IColumnType getColumnType(String t) {
+    public IColumnType getColumnType(String t) {
         String type = t.trim();
         if (StringUtils.equalsIgnoreCase("VARCHAR2", type)) {
             return new Varchar2ColumnType();
@@ -23,5 +23,4 @@ public class ColumnTypeFactory {
             throw new IllegalArgumentException(type + " is not supporting column type");
         }
     }
-
 }

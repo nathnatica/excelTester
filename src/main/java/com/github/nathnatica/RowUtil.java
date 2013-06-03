@@ -103,7 +103,8 @@ public class RowUtil {
     public static void fillTypeInfo(Row row, TableEntity table) {
         int start = RowUtil.DATA_START_COLUMN_INDEX;
         for (int j=0; j<table.columns.size(); j++) {
-            table.columns.get(j).type = ColumnTypeFactory.getColumnType(row.getCell(j+start).getStringCellValue());
+            IColumnTypeFactory factory = (IColumnTypeFactory) BeanConfigurator.getBean("columnTypeFactory");
+            table.columns.get(j).type = factory.getColumnType(row.getCell(j+start).getStringCellValue());
         }
     }
    

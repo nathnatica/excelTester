@@ -3,12 +3,9 @@ package com.github.nathnatica.sql;
 import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
-import com.github.nathnatica.model.column.RawColumnType;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,11 +32,12 @@ public class SelectSql implements ISql {
             if (!isFirstColumn) {
                 sb.append(",");
             }
-            if (column.type instanceof RawColumnType) {
-                sb.append("gldecrypt(").append(column.name).append(")");
-            } else {
-                sb.append(column.name);
-            }
+            sb.append(column.type.getSelectSqlPart(column.name));
+//            if (column.type instanceof RawColumnType) {
+//                sb.append("gldecrypt(").append(column.name).append(")");
+//            } else {
+//                sb.append(column.name);
+//            }
             isFirstColumn = false;
         }
         sb.append(" from ");

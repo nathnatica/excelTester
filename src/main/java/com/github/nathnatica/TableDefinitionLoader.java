@@ -43,7 +43,8 @@ public class TableDefinitionLoader {
                 }
 
                 TableDefEntity entity = new TableDefEntity();
-                entity.setType(ColumnTypeFactory.getColumnType(typeName));
+                IColumnTypeFactory factory = (IColumnTypeFactory) BeanConfigurator.getBean("columnTypeFactory");
+                entity.setType(factory.getColumnType(typeName));
                 entity.setPk(StringUtils.equalsIgnoreCase("Yes", pkName));
 
                 String key = getKey(tableName, columnName);

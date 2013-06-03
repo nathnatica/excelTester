@@ -32,6 +32,11 @@ public class DateColumnType implements IColumnType {
     }
 
     @Override
+    public String getSelectSqlPart(String name) {
+        return name;
+    }
+
+    @Override
     public void fillInsertSql(PreparedStatement preparedStatement, int index, String value) throws Exception {
         preparedStatement.setString(index, value);
     }
