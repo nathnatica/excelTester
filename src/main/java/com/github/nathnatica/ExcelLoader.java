@@ -336,13 +336,15 @@ public class ExcelLoader {
                         int start = RowUtil.DATA_START_COLUMN_INDEX;
                         for (int k=0; k<r.actuals.size(); k++) {
                             
-                            IColumnType type = targetTable.columns.get(k).type;
+                            ColumnEntity column = targetTable.columns.get(k);
                             
                             Cell c = row.getCell(k + start);
-                            if (type.isSame(r.expecteds.get(k), r.actuals.get(k))) {
-                                ExcelUtil.setOK(c, wb);
-                            } else {
-                                ExcelUtil.setNG(c, wb);
+                            if (StringUtils.equalsIgnoreCase("e", column.check)) { // if check condition is equal
+                                if (column.type.isSame(r.expecteds.get(k), r.actuals.get(k))) {
+                                    ExcelUtil.setOK(c, wb);
+                                } else {
+                                    ExcelUtil.setNG(c, wb);
+                                }
                             }
                         }
                         actualRecordIndex++;
