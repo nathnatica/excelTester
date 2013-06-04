@@ -58,21 +58,7 @@ public class InsertSql implements ISql {
             for (int i=0; i<cList.size(); i++) {
                 ColumnEntity c = cList.get(i);
                 logger.debug(i + "(" + c.name + ") = \"" + vList.get(i) + "\"");
-                if (StringUtils.equalsIgnoreCase("VARCHAR2", c.type)) {
-                    preparedStatement.setString(i+1, vList.get(i));
-                } else if (StringUtils.equalsIgnoreCase("NUMBER", c.type)) {
-                    if (StringUtils.isNotEmpty(vList.get(i))) {
-                        preparedStatement.setBigDecimal(i+1, new BigDecimal(vList.get(i)));
-                    } else {
-                        preparedStatement.setBigDecimal(i+1, null);
-                    }
-                } else if (StringUtils.equalsIgnoreCase("RAW", c.type)) {
-                    preparedStatement.setString(i+1, vList.get(i));
-                } else if (StringUtils.equalsIgnoreCase("DATE", c.type)) {
-                    preparedStatement.setString(i+1, vList.get(i));
-                } else {
-                    throw new Exception("wrong column type");
-                }
+                c.type.fillInsertSql(preparedStatement, i+1, vList.get(i));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,7 +74,6 @@ public class InsertSql implements ISql {
 
     @Override
     public void postProcess(RecordEntity r) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
