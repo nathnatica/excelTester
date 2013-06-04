@@ -43,16 +43,16 @@ public class ExcelUtil {
     public static void setOK(Cell c, Workbook wb) {
         c.setCellValue("OK");
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
-//        style.setFillBackgroundColor(new XSSFColor(new java.awt.Color(0, 128, 0)));
-        style.setFillBackgroundColor(new XSSFColor(Color.GREEN));
+//        style.setFillForegroundColor(new XSSFColor(new java.awt.Color(0, 128, 0)));
+        style.setFillForegroundColor(new XSSFColor(Color.GREEN));
         style.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
         c.setCellStyle(style);
     }
     public static void setNG(Cell c, Workbook wb) {
         c.setCellValue("NG");
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
-//        style.setFillBackgroundColor(new XSSFColor(new java.awt.Color(128, 0, 0)));
-        style.setFillBackgroundColor(new XSSFColor(Color.RED));
+//        style.setFillForegroundColor(new XSSFColor(new java.awt.Color(128, 0, 0)));
+        style.setFillForegroundColor(new XSSFColor(Color.RED));
         style.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
         c.setCellStyle(style);
     }

@@ -45,7 +45,7 @@ public class ExcelLoader {
             if ((Argument.isInsertAction() || Argument.isDeleteAction()) && wb.getSheetAt(i).getSheetName().contains("input")) {
                 logger.debug("read input sheet");
                 tables = readSheet(wb.getSheetAt(i));
-            } else if (Argument.isCheckAction() && wb.getSheetAt(i).getSheetName().contains("check")) {
+            } else if ((Argument.isCheckAction() || Argument.isDeleteAction()) && wb.getSheetAt(i).getSheetName().contains("check")) {
                 logger.debug("read check sheet");
                 tables = readSheet(wb.getSheetAt(i));
             }

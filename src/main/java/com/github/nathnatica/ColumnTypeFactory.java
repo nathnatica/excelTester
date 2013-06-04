@@ -20,7 +20,8 @@ public class ColumnTypeFactory implements IColumnTypeFactory {
         } else if (StringUtils.equalsIgnoreCase("RAW", type)) {
             return new RawColumnType();
         } else {
-            throw new IllegalArgumentException(type + " is not supporting column type");
+            return null;
+//            throw new IllegalArgumentException(type + " is not supporting column type");
         }
     }
 }

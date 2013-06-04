@@ -8,6 +8,8 @@ import com.github.nathnatica.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,10 +58,23 @@ public class RowUtil {
     public static boolean isCountRow(Row row) {
         return matchesRowType("count", row);
     }
-
+    public static boolean isDeleteRow(Row row) {
+        return matchesRowType("d", row);
+    }
+    
     private static boolean matchesRowType(String type, Row row) {
-        return row != null && row.getCell(CONTROL_COLUMN_INDEX) != null
-                && StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), type);
+        if (row != null && row.getCell(CONTROL_COLUMN_INDEX) != null && StringUtils.isNotEmpty(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue())) {
+            String temp = row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue().trim();
+            String[] arr = temp.split(",");
+            for (String e : arr) {
+                if (StringUtils.equalsIgnoreCase(e, type)) {
+                    return true;    
+                }
+            }
+        }
+        return false;
+//        return row != null && row.getCell(CONTROL_COLUMN_INDEX) != null
+//                && StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), type);
     }
 
     public static String getRowType(Row row) {

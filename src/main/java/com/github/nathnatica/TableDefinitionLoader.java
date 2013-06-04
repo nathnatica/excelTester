@@ -40,18 +40,19 @@ public class TableDefinitionLoader {
                 
                 if (i == first) {
                     checkTableDefHeader(tableName, columnName, typeName, pkName);
+                } else {
+                    TableDefEntity entity = new TableDefEntity();
+                    IColumnTypeFactory factory = (IColumnTypeFactory) BeanConfigurator.getBean("columnTypeFactory");
+                    entity.setType(factory.getColumnType(typeName));
+                    entity.setPk(StringUtils.equalsIgnoreCase("Yes", pkName));
+
+                    String key = getKey(tableName, columnName);
+                    tableDef.put(key, entity);
                 }
-
-                TableDefEntity entity = new TableDefEntity();
-                IColumnTypeFactory factory = (IColumnTypeFactory) BeanConfigurator.getBean("columnTypeFactory");
-                entity.setType(factory.getColumnType(typeName));
-                entity.setPk(StringUtils.equalsIgnoreCase("Yes", pkName));
-
-                String key = getKey(tableName, columnName);
-                tableDef.put(key, entity);
             }
+        } else {
+            tableDef = Collections.EMPTY_MAP;
         }
-        tableDef = Collections.EMPTY_MAP;
     }
 
     private static void checkTableDefHeader(String tableName, String columnName, String typeName, String pkName) throws Exception {

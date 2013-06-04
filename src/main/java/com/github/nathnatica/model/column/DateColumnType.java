@@ -58,8 +58,8 @@ public class DateColumnType implements IColumnType {
 
     @Override
     public boolean isSame(String expect, String actual) {
-        String e = expect.replaceAll("/", "").replaceAll(":","").replaceAll(" ","").replaceAll("\\.","");
-        String a = actual.replaceAll("/", "").replaceAll(":","").replaceAll(" ","").replaceAll("\\.","");
+        String e = expect.replaceAll("/", "").replaceAll(":","").replaceAll(" ","").replaceAll("\\.","").replaceAll("-","");
+        String a = actual.replaceAll("/", "").replaceAll(":","").replaceAll(" ","").replaceAll("\\.","").replaceAll("-","");
         
         while (e.length() != a.length()) {
             if (e.length() < a.length()) {
