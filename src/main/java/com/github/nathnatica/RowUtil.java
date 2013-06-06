@@ -39,7 +39,7 @@ public class RowUtil {
         return matchesRowType("condition", row);
     }
 
-    public static boolean isRecordRow(Row row) {
+    public static boolean isInertRow(Row row) {
         return matchesRowType("i", row);
     }
 

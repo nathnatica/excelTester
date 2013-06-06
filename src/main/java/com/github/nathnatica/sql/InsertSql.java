@@ -52,7 +52,7 @@ public class InsertSql implements ISql {
     public boolean fillSql(PreparedStatement preparedStatement, RecordEntity r) throws Exception {
         List<ColumnEntity> cList = r.columns;
         List<String> vList = r.values;
-        logger.error("column list size {}, value list size {} ", cList.size(), vList.size());
+        logger.info("column list size {}, value list size {} ", cList.size(), vList.size());
 
         try {
             for (int i=0; i<cList.size(); i++) {

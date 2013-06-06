@@ -33,7 +33,7 @@ public class ExcelUtil {
     }
 
     public static void writeFile(Workbook wb, String file) throws IOException {
-        FileOutputStream fileOut = new FileOutputStream(file);
+        FileOutputStream fileOut = new FileOutputStream(file.replace(".xls", "(checked)_" + TimeUtil.getYYYYMMDDHH24MISS() + ".xls"));
         wb.write(fileOut);
         fileOut.close();
         logger.info("{} file has been written", file);

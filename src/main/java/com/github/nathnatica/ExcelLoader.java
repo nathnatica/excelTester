@@ -2,19 +2,14 @@ package com.github.nathnatica;
 
 import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
-import com.github.nathnatica.model.TableDefEntity;
 import com.github.nathnatica.model.TableEntity;
-import com.github.nathnatica.model.column.IColumnType;
 import com.github.nathnatica.util.ExcelUtil;
-import com.github.nathnatica.util.StrUtil;
 import com.github.nathnatica.util.TimeUtil;
 import com.github.nathnatica.validator.Argument;
 import com.github.nathnatica.validator.InputData;
 import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -96,6 +91,7 @@ public class ExcelLoader {
 
         List<TableEntity> tables = new ArrayList<TableEntity>();
         TableEntity table = null;
+        int deleteRowCount = 0;
 //        List<ColumnEntity> columns = null;
 //        List<RecordEntity> records = null;
 //        int start = RowUtil.DATA_START_COLUMN_INDEX;
@@ -152,7 +148,7 @@ public class ExcelLoader {
 //                        columns.get(j).check = c.getStringCellValue().trim();
 //                    }
 //                }
-            } else if (RowUtil.isExpectRow(row) && isTargetTable) {
+            } else if (Argument.isCheckAction() && RowUtil.isExpectRow(row) && isTargetTable) {
                 RowUtil.fillExpectInfo(row, table);
 //                RecordEntity record = new RecordEntity();
 //                record.columns = columns;
@@ -169,7 +165,7 @@ public class ExcelLoader {
 //                record.expecteds= values;
 //                records.add(record);
             // add for check feature   
-            } else if (RowUtil.isRecordRow(row) && isTargetTable) {
+            } else if (RowUtil.isInertRow(row) && isTargetTable) {
                 RowUtil.fillRecordInfo(row, table);
 //                RecordEntity record = new RecordEntity();
 //                record.columns = columns;
@@ -185,12 +181,17 @@ public class ExcelLoader {
 //                }
 //                record.values = values;
 //                records.add(record);
+            } else if (Argument.isDeleteAction() && RowUtil.isDeleteRow(row) && isTargetTable) {
+                RowUtil.fillRecordInfo(row, table);
+                deleteRowCount++;
             } else if (RowUtil.isCountRow(row) && isTargetTable) {
                 RowUtil.fillCountInfo(row, table);
 //                table.count = Integer.parseInt(row.getCell(RowUtil.DATA_START_COLUMN_INDEX).getStringCellValue().trim());
 //                table.records = records;
+                table.deleteRowCount = deleteRowCount;
                 tables.add(table);
                 table = null;
+                deleteRowCount = 0;
 //                columns = null;
 //                records = null;
                 isTargetTable = false;
@@ -251,7 +252,7 @@ public class ExcelLoader {
 //                        columns.get(j).condition = c.getStringCellValue().trim();
 //                    }
 //                }
-//            } else if (RowUtil.isRecordRow(row) && isTargetTable) {
+//            } else if (RowUtil.isInertRow(row) && isTargetTable) {
 //                RecordEntity record = new RecordEntity();
 //                record.columns = columns;
 //                record.type = RowUtil.getRowType(row);

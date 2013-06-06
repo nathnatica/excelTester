@@ -10,4 +10,5 @@ public class TableEntity {
     public List<ColumnEntity> columns;
     public List<RecordEntity> records;
     public int count;
+    public int deleteRowCount;
 }

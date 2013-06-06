@@ -68,9 +68,12 @@ public class DeleteSql implements ISql {
 
     @Override
     public void validateExecutionCount() throws Exception {
-        if (resultCount != table.count) {
+        if (resultCount != table.count && table.deleteRowCount == 0) {
             logger.error("for table {}, expect {} records {}ed, but actual {} records", new Object[] {table.name, table.count, name, resultCount}) ;
             throw new Exception("processed record number is not matched with excel input");
+        } else if (resultCount != table.deleteRowCount && table.deleteRowCount != 0) {
+                logger.error("for table {}, expect {} records {}ed, but actual {} records", new Object[] {table.name, table.count, name, resultCount}) ;
+                throw new Exception("processed record number is not matched with excel input");
         } else {
             logger.info("for table {}, {} records had been [{}]ed", new Object[] {table.name, resultCount, name});
         }
