@@ -33,11 +33,6 @@ public class SelectSql implements ISql {
                 sb.append(",");
             }
             sb.append(column.type.getSelectSqlPart(column.name));
-//            if (column.type instanceof RawColumnType) {
-//                sb.append("gldecrypt(").append(column.name).append(")");
-//            } else {
-//                sb.append(column.name);
-//            }
             isFirstColumn = false;
         }
         sb.append(" from ");
@@ -109,10 +104,10 @@ public class SelectSql implements ISql {
     @Override
     public void validateExecutionCount() throws Exception {
         if (resultCount != table.count) {
-            logger.error("for table {}, expect {} records {}ed, but actual {} records", new Object[] {table.name, table.count, name, resultCount}) ;
+            logger.error("for table [{}][{}], expect {} records [{}]ed, but actual {} records", new Object[] {table.sheetName, table.name, table.count, name, resultCount}) ;
             throw new Exception("processed record number is not matched with excel input");
         } else {
-            logger.info("for table {}, {} records had been [{}]ed", new Object[] {table.name, resultCount, name});
+            logger.info("for table [{}][{}], {} records had been [{}]ed", new Object[] {table.sheetName, table.name, resultCount, name});
         }
     }
 

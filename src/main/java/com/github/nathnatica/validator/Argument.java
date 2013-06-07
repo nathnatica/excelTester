@@ -19,7 +19,7 @@ public class Argument {
         }
     }
     
-    public static Action action = Action.INSERT;
+    public static Action action = Action.CHECK;
     
     public static boolean isValid(String[] args) {
         if (args == null || args.length == 0) {
@@ -30,15 +30,16 @@ public class Argument {
             System.out.println("needs argument[0] - excel file name");
             return false;
         }
-        if (args == null || args.length == 2) {
+        if (args.length == 2) {
             if (StringUtils.equalsIgnoreCase(args[1], "insert") || StringUtils.equalsIgnoreCase(args[1], "ins")) {
-                // default action : insert 
+                action = Action.INSERT;
             } else if (StringUtils.equalsIgnoreCase(args[1], "delete") || StringUtils.equalsIgnoreCase(args[1], "del")) {
                 action = Action.DELETE;
             } else if (StringUtils.equalsIgnoreCase(args[1], "check") || StringUtils.equalsIgnoreCase(args[1], "che")) {
                 action = Action.CHECK;
             } else {
                 System.out.println("wrong action name for argument[1]");
+                System.out.println(">> ins[ert], che[ck], del[ete] are available");
                 return false;
             }
         }

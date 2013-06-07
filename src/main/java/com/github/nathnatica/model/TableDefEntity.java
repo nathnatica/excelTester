@@ -1,6 +1,6 @@
 package com.github.nathnatica.model;
 
-import com.github.nathnatica.model.column.*;
+import com.github.nathnatica.model.column.IColumnType;
 
 public class TableDefEntity {
     private IColumnType type;

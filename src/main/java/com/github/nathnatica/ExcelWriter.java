@@ -4,14 +4,14 @@ import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
 import com.github.nathnatica.util.ExcelUtil;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
 
 public class ExcelWriter {
     final static Logger logger = LoggerFactory.getLogger(ExcelWriter.class);
@@ -75,7 +75,7 @@ public class ExcelWriter {
                             ColumnEntity column = targetTable.columns.get(k);
 
                             Cell c = row.getCell(k + start);
-                            if (StringUtils.equalsIgnoreCase("e", column.check)) { // if check condition is equal
+                            if (column.isCheckTypeEqual()) {
                                 if (column.type.isSame(r.expecteds.get(k), r.actuals.get(k))) {
                                     ExcelUtil.setOK(c, wb);
                                 } else {

@@ -2,6 +2,7 @@ package com.github.nathnatica.sql;
 
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 

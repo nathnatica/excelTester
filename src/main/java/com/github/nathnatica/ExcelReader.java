@@ -1,12 +1,15 @@
 package com.github.nathnatica;
 
 import com.github.nathnatica.model.TableEntity;
-import com.github.nathnatica.util.ExcelUtil;
 import com.github.nathnatica.validator.Argument;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExcelReader {
     final static Logger logger = LoggerFactory.getLogger(ExcelReader.class);
@@ -42,6 +45,7 @@ public class ExcelReader {
             Row row = sheet.getRow(i);
             if (RowUtil.isTableRow(row)) {
                 table = RowUtil.makeTableEntity(row);
+                table.sheetName = sheet.getSheetName();
                 isTargetTable = true;
             } else if (RowUtil.isColumnRow(row) && isTargetTable) {
                 RowUtil.fillColumnInfo(row, table);

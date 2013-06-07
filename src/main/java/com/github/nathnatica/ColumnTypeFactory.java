@@ -1,10 +1,6 @@
 package com.github.nathnatica;
 
-import com.github.nathnatica.model.column.IColumnType;
-import com.github.nathnatica.model.column.DateColumnType;
-import com.github.nathnatica.model.column.NumberColumnType;
-import com.github.nathnatica.model.column.RawColumnType;
-import com.github.nathnatica.model.column.Varchar2ColumnType;
+import com.github.nathnatica.model.column.*;
 import org.apache.commons.lang3.StringUtils;
 
 public class ColumnTypeFactory implements IColumnTypeFactory {
@@ -21,7 +17,6 @@ public class ColumnTypeFactory implements IColumnTypeFactory {
             return new RawColumnType();
         } else {
             return null;
-//            throw new IllegalArgumentException(type + " is not supporting column type");
         }
     }
 }

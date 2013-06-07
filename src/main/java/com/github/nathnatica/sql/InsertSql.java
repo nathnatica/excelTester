@@ -3,11 +3,9 @@ package com.github.nathnatica.sql;
 import com.github.nathnatica.model.ColumnEntity;
 import com.github.nathnatica.model.RecordEntity;
 import com.github.nathnatica.model.TableEntity;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -79,10 +77,10 @@ public class InsertSql implements ISql {
     @Override
     public void validateExecutionCount() throws Exception {
         if (resultCount != table.count) {
-            logger.error("for table {}, expect {} records {}ed, but actual {} records", new Object[] {table.name, table.count, name, resultCount}) ;
+            logger.error("for table [{}][{}], expect {} records [{}]ed, but actual {} records", new Object[] {table.sheetName, table.name, table.count, name, resultCount}) ;
             throw new Exception("processed record number is not matched with excel input");
         } else {
-            logger.info("for table {}, {} records had been [{}]ed", new Object[] {table.name, resultCount, name});
+            logger.info("for table [{}][{}], {} records had been [{}]ed", new Object[] {table.sheetName, table.name, resultCount, name});
         }
     }
 }

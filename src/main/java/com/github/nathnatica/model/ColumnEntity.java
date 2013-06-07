@@ -1,7 +1,9 @@
 package com.github.nathnatica.model;
 
+import com.github.nathnatica.RowUtil;
 import com.github.nathnatica.model.column.IColumnType;
 import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 public class ColumnEntity {
@@ -38,6 +40,10 @@ public class ColumnEntity {
     }
     
     public boolean isWhereColumn() {
-        return StringUtils.equalsIgnoreCase("W", this.condition);
+        return StringUtils.equalsIgnoreCase(RowUtil.COLUMN_CONDITON_WHERE, this.condition);
+    }
+
+    public boolean isCheckTypeEqual() {
+        return StringUtils.equalsIgnoreCase(RowUtil.COLUMN_CHECK_TYPE_EQUAL, this.check);
     }
 }

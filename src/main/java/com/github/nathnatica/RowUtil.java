@@ -8,8 +8,6 @@ import com.github.nathnatica.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +16,11 @@ public class RowUtil {
 
     public static final int CONTROL_COLUMN_INDEX = 1; // in excel file
     public static final int DATA_START_COLUMN_INDEX = 3; // in excel file
-
+    public static final String CONTROL_COLUMN_DELEMITER = ",";
+    public static final String COLUMN_CONDITON_WHERE = "W";
+    public static final String COLUMN_CHECK_TYPE_EQUAL = "e";
+    
+    
     public static boolean isTableRow(Row row) {
         return matchesRowType("table", row);
     }
@@ -65,7 +67,7 @@ public class RowUtil {
     private static boolean matchesRowType(String type, Row row) {
         if (row != null && row.getCell(CONTROL_COLUMN_INDEX) != null && StringUtils.isNotEmpty(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue())) {
             String temp = row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue().trim();
-            String[] arr = temp.split(",");
+            String[] arr = temp.split(CONTROL_COLUMN_DELEMITER);
             for (String e : arr) {
                 if (StringUtils.equalsIgnoreCase(e, type)) {
                     return true;    
@@ -73,8 +75,6 @@ public class RowUtil {
             }
         }
         return false;
-//        return row != null && row.getCell(CONTROL_COLUMN_INDEX) != null
-//                && StringUtils.equalsIgnoreCase(row.getCell(CONTROL_COLUMN_INDEX).getStringCellValue(), type);
     }
 
     public static String getRowType(Row row) {
@@ -109,7 +109,7 @@ public class RowUtil {
                 TableDefEntity def = TableDefinitionLoader.get(table.name, column.name);
                 column.type = def.getType();
                 if (def.isPk()) {
-                    column.condition = "W";
+                    column.condition = COLUMN_CONDITON_WHERE;
                 }
             }
         }
