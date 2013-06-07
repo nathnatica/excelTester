@@ -30,8 +30,8 @@ public class DAO {
         try {
             conn.setAutoCommit(false);
 
-            ISql sqlObject = sqlFactory.getSqlFor(action);
             for (TableEntity table : tables) {
+                ISql sqlObject = sqlFactory.getSqlFor(action);
                 executeTableSqls(conn, table, sqlObject);                
             }
             conn.commit();
@@ -70,7 +70,6 @@ public class DAO {
 
         PreparedStatement preparedStatement = null;
         try {
-            
             for (RecordEntity r : table.records) {
                 preparedStatement = dbConnection.prepareStatement(sql);
                 boolean hasRecord = sqlObject.fillSql(preparedStatement, r);
@@ -81,9 +80,8 @@ public class DAO {
 
                 sqlObject.postProcess(r);
 
-                sqlObject.validateExecutionCount();
             }
-
+            sqlObject.validateExecutionCount();
         } catch (SQLException e) {
             logger.debug(e.getMessage());
             throw e;

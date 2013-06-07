@@ -92,7 +92,7 @@ public class SelectSql implements ISql {
                 resultCount++;
             }
             if (rs.next()) {
-                logger.error("more than 1 record is selelcted");
+                logger.error("more than 1 record is selected");
                 throw new Exception();
             }
         } catch (Exception e) {

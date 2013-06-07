@@ -53,8 +53,11 @@
             <level>INFO</level>
         </filter>
         <layout class="ch.qos.logback.classic.PatternLayout">
+            <!--<pattern>-->
+                <!--%d{HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n-->
+            <!--</pattern>-->
             <pattern>
-                %d{HH:mm:ss.SSS} [%thread] %-5level %logger{32} - %msg%n
+                %d{HH:mm:ss.SSS} %-5level %logger{32} %L - %msg%n
             </pattern>
         </layout>
     </appender>
@@ -68,9 +71,12 @@
             <appender name="FILE-${logname}" class="ch.qos.logback.core.FileAppender">
                 <file>${logname}.log</file>
                 <layout class="ch.qos.logback.classic.PatternLayout">
-                    <Pattern>
-                        %d{HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n
-                    </Pattern>
+                    <!--<Pattern>-->
+                        <!--%d{HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n-->
+                    <!--</Pattern>-->
+                    <pattern>
+                        %d{HH:mm:ss.SSS} %-5level %logger{32} %L - %msg%n
+                    </pattern>
                 </layout>
             </appender>
         </sift>
