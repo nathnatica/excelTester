@@ -48,8 +48,8 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
-        <filter class="com.github.nathnatica.filter.ThresholdLoggerFilter">
-            <logger>com.github.nathnatica</logger>
+        <filter class="com.github.tester.filter.ThresholdLoggerFilter">
+            <logger>com.github.tester</logger>
             <level>INFO</level>
         </filter>
         <layout class="ch.qos.logback.classic.PatternLayout">
@@ -82,7 +82,7 @@
         </sift>
     </appender>
 
-    <logger name="com.github.nathnatica">
+    <logger name="com.github.tester">
         <level value="DEBUG" />
         <appender-ref ref="STDOUT"/>
         <!--<appender-ref ref="SIFT"/>-->
