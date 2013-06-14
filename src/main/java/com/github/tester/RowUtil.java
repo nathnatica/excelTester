@@ -8,16 +8,22 @@ import com.github.tester.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+<<<<<<< .merge_file_sa6Fem
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+=======
+>>>>>>> .merge_file_9bbNVd
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RowUtil {
 
+<<<<<<< .merge_file_sa6Fem
     final static Logger logger = LoggerFactory.getLogger(RowUtil.class);
     
+=======
+>>>>>>> .merge_file_9bbNVd
     public static final int CONTROL_COLUMN_INDEX = 1; // in excel file
     public static final int DATA_START_COLUMN_INDEX = 3; // in excel file
     public static final String CONTROL_COLUMN_DELEMITER = ",";
@@ -104,9 +110,12 @@ public class RowUtil {
         for (int j=start; j<=end; j++) {
             ColumnEntity column = new ColumnEntity(table.columns.size());
             column.name = StrUtil.capitalize(row.getCell(j).getStringCellValue().trim());
+<<<<<<< .merge_file_sa6Fem
             if (StringUtils.isEmpty(column.name)) {
                 logger.error("[{}][{}]'s [{}]th column name is empty", new Object[]{table.sheetName, table.name, j-start-1});
             }
+=======
+>>>>>>> .merge_file_9bbNVd
             table.columns.add(column);
         }
 
