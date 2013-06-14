@@ -39,6 +39,9 @@ public class TestRunner {
         }
         
         logger.info("TestRunner ended successfully");
+        logger.info("##############################################");
+        logger.info("####### {} work ended", Argument.action.getValue());
+        logger.info("##############################################");
     }
 
     private static void setLog(String file) throws IOException {

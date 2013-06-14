@@ -156,7 +156,11 @@ public class RowUtil {
         for (int j=0; j<columns.size(); j++) {
             Cell c = row.getCell(j+start);
             if (c != null) {
-                values.add(c.getStringCellValue().trim());
+                if (c.getStringCellValue().contains("{{{") && c.getStringCellValue().contains("}}}")) { // for space only value
+                    values.add(c.getStringCellValue().trim().replace("{{{", "").replace("}}}",""));   
+                } else {
+                    values.add(c.getStringCellValue().trim());
+                }
             } else {
                 values.add(null);
             }
