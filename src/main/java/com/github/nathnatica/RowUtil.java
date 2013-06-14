@@ -8,12 +8,16 @@ import com.github.nathnatica.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RowUtil {
 
+    final static Logger logger = LoggerFactory.getLogger(RowUtil.class);
+    
     public static final int CONTROL_COLUMN_INDEX = 1; // in excel file
     public static final int DATA_START_COLUMN_INDEX = 3; // in excel file
     public static final String CONTROL_COLUMN_DELEMITER = ",";
@@ -100,6 +104,9 @@ public class RowUtil {
         for (int j=start; j<=end; j++) {
             ColumnEntity column = new ColumnEntity(table.columns.size());
             column.name = StrUtil.capitalize(row.getCell(j).getStringCellValue().trim());
+            if (StringUtils.isEmpty(column.name)) {
+                logger.error("[{}][{}]'s [{}]th column name is empty", new Object[]{table.sheetName, table.name, j-start-1});
+            }
             table.columns.add(column);
         }
 
