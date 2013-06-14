@@ -5,11 +5,11 @@
        http://www.springframework.org/schema/beans classpath:xsd/spring-beans-3.1.xsd">
 
     <beans profile="dev">
-        <bean id="sqlMaker" class="com.github.nathnatica.SqlFactory"  />
-        <bean id="columnTypeFactory" class="com.github.nathnatica.ColumnTypeFactory" />
+        <bean id="sqlMaker" class="com.github.tester.SqlFactory"  />
+        <bean id="columnTypeFactory" class="com.github.tester.ColumnTypeFactory" />
     </beans>
     <beans profile="test">
-        <bean id="sqlMaker" class="com.github.nathnatica.SqlFactory" />
-        <bean id="columnTypeFactory" class="com.github.nathnatica.ColumnTypeFactory" />
+        <bean id="sqlMaker" class="com.github.tester.SqlFactory" />
+        <bean id="columnTypeFactory" class="com.github.tester.ColumnTypeFactory" />
     </beans>
 </beans>

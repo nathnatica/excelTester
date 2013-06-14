@@ -156,7 +156,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.github.nathnatica.TestRunner</mainClass>
+                            <mainClass>com.github.tester.TestRunner</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
