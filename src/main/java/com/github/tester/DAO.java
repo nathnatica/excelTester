@@ -67,7 +67,8 @@ public class DAO {
     private void executeTableSqls(Connection dbConnection, TableEntity table, ISql sqlObject) throws Exception {
 
         String sql = sqlObject.getSqlFor(table);
-
+        logger.debug(sql);
+        
         PreparedStatement preparedStatement = null;
         try {
             for (RecordEntity r : table.records) {

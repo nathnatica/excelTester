@@ -11,7 +11,9 @@ import java.util.List;
 public class RawColumnType implements IColumnType {
     @Override
     public String getInsertSqlPart(String value) {
-        if (value.matches("[A-Z0-9]+")) {
+        if (value.matches("[0-9]+")) {
+            return "glencrypt(?)";
+        } else if (value.matches("[A-F0-9]+")) {
             return "?";
         } else {
             return "glencrypt(?)";
@@ -21,7 +23,7 @@ public class RawColumnType implements IColumnType {
     @Override
     public String getDeleteSqlPart(ColumnEntity c, List<RecordEntity> records) {
         String sampleValue = c.getSampleColumnValue(records);
-        if (!sampleValue.matches("[A-Z0-9]+")) {
+        if (!sampleValue.matches("[A-F0-9]+")) {
             return "gldecrypt(" + c.name + ")";
         }
         return c.name;
