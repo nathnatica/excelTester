@@ -60,18 +60,22 @@ public class DateColumnType implements IColumnType {
 
     @Override
     public boolean isSame(String expect, String actual) {
-        String e = expect.replaceAll("/", "").replaceAll(":","").replaceAll(" ","").replaceAll("\\.","").replaceAll("-","");
-        String a = actual.replaceAll("/", "").replaceAll(":","").replaceAll(" ","").replaceAll("\\.","").replaceAll("-","");
-        
-        while (e.length() != a.length()) {
-            if (e.length() < a.length()) {
-                e = e + "0";    
-            } else if (e.length() > a.length()) {
-                a = a + "0";
+        if (StringUtils.isNotEmpty(expect) && StringUtils.isNotEmpty(actual)) {
+            String e = expect.replaceAll("/", "").replaceAll(":","").replaceAll(" ","").replaceAll("\\.","").replaceAll("-","");
+            String a = actual.replaceAll("/", "").replaceAll(":","").replaceAll(" ","").replaceAll("\\.","").replaceAll("-","");
+
+            while (e.length() != a.length()) {
+                if (e.length() < a.length()) {
+                    e = e + "0";
+                } else if (e.length() > a.length()) {
+                    a = a + "0";
+                }
             }
+
+            return StringUtils.equals(e, a);
+        } else {
+             return StringUtils.isEmpty(expect) && StringUtils.isEmpty(actual);   
         }
-        
-        return StringUtils.equals(e, a);
     }
 
 }

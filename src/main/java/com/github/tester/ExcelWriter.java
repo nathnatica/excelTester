@@ -35,7 +35,7 @@ public class ExcelWriter {
                         targetTable = tables.get(tableIndex++);
                         isTargetTable = true;
                     } else if (RowUtil.isActualRow(row) && isTargetTable) {
-                        RecordEntity r = targetTable.records.get(actualRecordIndex++);
+                        RecordEntity r = targetTable.records.get(actualRecordIndex);
                         int start = RowUtil.DATA_START_COLUMN_INDEX;
                         for (int k=0; k<r.actuals.size(); k++) {
                             Cell c = row.getCell(k + start);
@@ -68,7 +68,7 @@ public class ExcelWriter {
                         targetTable = tables.get(tableIndex++);
                         isTargetTable = true;
                     } else if (RowUtil.isResultRow(row) && isTargetTable) {
-                        RecordEntity r = targetTable.records.get(actualRecordIndex++);
+                        RecordEntity r = targetTable.records.get(actualRecordIndex);
                         int start = RowUtil.DATA_START_COLUMN_INDEX;
                         for (int k=0; k<r.actuals.size(); k++) {
 
