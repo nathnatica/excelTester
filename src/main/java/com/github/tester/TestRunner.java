@@ -29,7 +29,7 @@ public class TestRunner {
         if (!InputData.isValid(tables)) return;
 
         DAO dao = new DAO();
-        dao.execute(tables, Argument.action);
+        boolean result = dao.execute(tables, Argument.action);
         
         if (Argument.isCheckAction()) {
             InputData.check(tables);
@@ -37,11 +37,16 @@ public class TestRunner {
             ExcelWriter.writeCheckResults(tables, wb);
             ExcelUtil.writeFile(wb, file);
         }
-        
-        logger.info("TestRunner ended successfully");
-        logger.info("##############################################");
-        logger.info("####### {} work ended", Argument.action.getValue());
-        logger.info("##############################################");
+         
+        if (result) {
+            logger.info("TestRunner ended successfully");
+            logger.info("##############################################");
+            logger.info("####### {} work ended", Argument.action.getValue());
+            logger.info("##############################################");
+        } else {
+            logger.error(">>>>> ERROR <<<<<");
+            logger.error(">>>>> TestRunner ended with Errors, check the log file");
+        }
     }
 
     private static void setLog(String file) throws IOException {

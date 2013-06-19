@@ -45,6 +45,10 @@ public class Varchar2ColumnType implements IColumnType {
     
     @Override
     public boolean isSame(String expect, String actual) {
-        return StringUtils.equals(expect, actual);
+        if (StringUtils.isNotEmpty(expect) && StringUtils.isNotEmpty(actual)) {
+            return StringUtils.equals(expect.trim(), actual.trim());
+        } else {
+            return StringUtils.isEmpty(expect) && StringUtils.isEmpty(actual);
+        }
     }
 }

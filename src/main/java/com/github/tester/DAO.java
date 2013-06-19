@@ -21,7 +21,7 @@ public class DAO {
     private static final String DB_USER = PropertyUtil.getProperty("db.user");
     private static final String DB_PASSWORD = PropertyUtil.getProperty("db.password");
 
-    public void execute(List<TableEntity> tables, Argument.Action action) {
+    public boolean execute(List<TableEntity> tables, Argument.Action action) {
         
         SqlFactory sqlFactory = (SqlFactory) BeanConfigurator.getBean("sqlMaker"); 
         
@@ -36,6 +36,7 @@ public class DAO {
             }
             conn.commit();
             logger.info("commited");
+            return true;
         } catch (SQLException e) {
             logger.debug(e.getMessage());
             try {
@@ -44,6 +45,7 @@ public class DAO {
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             try {
@@ -52,6 +54,7 @@ public class DAO {
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
+            return false;
         } finally {
             if (conn!= null) {
                 try {
