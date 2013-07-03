@@ -39,7 +39,7 @@ public class PropertyUtil {
         prop.putAll(prop2);
         stream.close();
 
-        File f = new File("C:\\application.properties file");
+        File f = new File("C:\\application.properties");
         if (f.canRead()) {
             logger.info("load external application.properties");
             InputStream is = new BufferedInputStream(new FileInputStream(f));
