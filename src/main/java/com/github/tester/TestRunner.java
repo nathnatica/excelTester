@@ -23,19 +23,28 @@ public class TestRunner {
         String file = args[0];
         setLog(file);
 
-        Workbook wb = ExcelUtil.getWorkbook(file);
-        List<TableEntity> tables = ExcelReader.getTableData(wb);
-
-        if (!InputData.isValid(tables)) return;
-
-        DAO dao = new DAO();
-        boolean result = dao.execute(tables, Argument.action);
+        TableDefinitionLoader.loadTableDef();
         
-        if (Argument.isCheckAction()) {
-            InputData.check(tables);
-            ExcelWriter.writeActuals(tables, wb);
-            ExcelWriter.writeCheckResults(tables, wb);
-            ExcelUtil.writeFile(wb, file);
+        boolean result = false;
+        for (int i = Argument.action.getStart(); i <= Argument.action.getEnd(); i++) {
+            Argument.action.setCurrent(i);
+            Workbook wb = ExcelUtil.getWorkbook(file);
+            List<TableEntity> tables = ExcelReader.getTableData(wb);
+
+            if (!InputData.isValid(tables)) return;
+
+            DAO dao = new DAO();
+            result = dao.execute(tables, Argument.action);
+
+            if (Argument.isCheckAction()) {
+                InputData.check(tables);
+                ExcelWriter.writeActuals(tables, wb);
+                ExcelWriter.writeCheckResults(tables, wb);
+                ExcelUtil.writeFile(wb, file);
+            }
+            if (i < Argument.action.getEnd()) {
+                Thread.sleep(1000*60*3);    
+            }
         }
          
         if (result) {

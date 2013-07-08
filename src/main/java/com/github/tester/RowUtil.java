@@ -5,6 +5,7 @@ import com.github.tester.model.RecordEntity;
 import com.github.tester.model.TableDefEntity;
 import com.github.tester.model.TableEntity;
 import com.github.tester.util.StrUtil;
+import com.github.tester.validator.Argument;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -156,7 +157,9 @@ public class RowUtil {
         for (int j=0; j<columns.size(); j++) {
             Cell c = row.getCell(j+start);
             if (c != null) {
-                if (c.getStringCellValue().contains("{{{") && c.getStringCellValue().contains("}}}")) { // for space only value
+                if (c.getStringCellValue().contains("{{{{}}}}")) {
+                    values.add(c.getStringCellValue().trim().replace("{{{{}}}}", "" + Argument.action.getCurrent()));
+                } else if (c.getStringCellValue().contains("{{{") && c.getStringCellValue().contains("}}}")) { // for space only value
                     values.add(c.getStringCellValue().trim().replace("{{{", "").replace("}}}",""));   
                 } else {
                     values.add(c.getStringCellValue().trim());

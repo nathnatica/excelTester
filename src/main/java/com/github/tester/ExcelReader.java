@@ -16,8 +16,6 @@ public class ExcelReader {
     
     public static List<TableEntity> getTableData(Workbook wb) throws Exception {
         
-        TableDefinitionLoader.loadTableDef();
-
         int sheets = wb.getNumberOfSheets();
         List<TableEntity> tables = new ArrayList<TableEntity>();
         for (int i = 0; i < sheets; i++) {

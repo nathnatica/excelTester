@@ -10,12 +10,26 @@ public class Argument {
         CHECK("check");
 
         private String value;
-        
+        private int start;
+        private int end;
+        private int current;
         Action(String value) {
             this.value = value;    
         }
         public String getValue() {
             return value;
+        }
+        public int getStart() {
+            return start; 
+        }
+        public int getEnd() {
+            return end;
+        }
+        public int getCurrent() {
+            return current;    
+        }
+        public void setCurrent(int cur) {
+            current = cur;
         }
     }
     
@@ -30,7 +44,7 @@ public class Argument {
             System.out.println("needs argument[0] - excel file name");
             return false;
         }
-        if (args.length == 2) {
+        if (args.length >= 2) {
             if (StringUtils.equalsIgnoreCase(args[1], "insert") || StringUtils.equalsIgnoreCase(args[1], "ins")) {
                 action = Action.INSERT;
             } else if (StringUtils.equalsIgnoreCase(args[1], "delete") || StringUtils.equalsIgnoreCase(args[1], "del")) {
@@ -42,6 +56,16 @@ public class Argument {
                 System.out.println(">> ins[ert], che[ck], del[ete] are available");
                 return false;
             }
+        }
+        
+        action.start = 1;
+        action.end = 1;
+        
+        if (args.length == 4) {
+            int start = Integer.parseInt(args[2]);
+            int end = Integer.parseInt(args[3]);
+            action.start = start;
+            action.end = end;
         }
         return true;
     }
