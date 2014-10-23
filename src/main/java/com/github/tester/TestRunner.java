@@ -5,11 +5,13 @@ import com.github.tester.util.ExcelUtil;
 import com.github.tester.util.TimeUtil;
 import com.github.tester.validator.Argument;
 import com.github.tester.validator.InputData;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.List;
 
@@ -18,9 +20,21 @@ public class TestRunner {
     
     public static void main(String[] args) throws Exception {
 
-        if (!Argument.isValid(args)) return;
-
-        String file = args[0];
+        String file = null;
+        if (!Argument.isValid(args)) {
+            if (StringUtils.equals(args[0], "gui")) {
+                file = JOptionPane.showInputDialog(null, "Input file name : ");
+                String action = JOptionPane.showInputDialog(null, "Action : ins[ert], che[ck], del[ete]");
+                if (Argument.decideAction(action)) {
+                    return;
+                }
+            } else {
+                return;
+            }
+        } else {
+             file = args[0];
+        }
+        
         setLog(file);
 
         TableDefinitionLoader.loadTableDef();

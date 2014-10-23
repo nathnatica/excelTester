@@ -10,8 +10,8 @@ public class Argument {
         CHECK("check");
 
         private String value;
-        private int start;
-        private int end;
+        private int start = 1;
+        private int end = 1;
         private int current;
         Action(String value) {
             this.value = value;    
@@ -45,21 +45,8 @@ public class Argument {
             return false;
         }
         if (args.length >= 2) {
-            if (StringUtils.equalsIgnoreCase(args[1], "insert") || StringUtils.equalsIgnoreCase(args[1], "ins")) {
-                action = Action.INSERT;
-            } else if (StringUtils.equalsIgnoreCase(args[1], "delete") || StringUtils.equalsIgnoreCase(args[1], "del")) {
-                action = Action.DELETE;
-            } else if (StringUtils.equalsIgnoreCase(args[1], "check") || StringUtils.equalsIgnoreCase(args[1], "che")) {
-                action = Action.CHECK;
-            } else {
-                System.out.println("wrong action name for argument[1]");
-                System.out.println(">> ins[ert], che[ck], del[ete] are available");
-                return false;
-            }
+            if (decideAction(args[1])) return false;
         }
-        
-        action.start = 1;
-        action.end = 1;
         
         if (args.length == 4) {
             int start = Integer.parseInt(args[2]);
@@ -69,7 +56,22 @@ public class Argument {
         }
         return true;
     }
-    
+
+    public static boolean decideAction(String arg) {
+        if (StringUtils.equalsIgnoreCase(arg, "insert") || StringUtils.equalsIgnoreCase(arg, "ins")) {
+            action = Action.INSERT;
+        } else if (StringUtils.equalsIgnoreCase(arg, "delete") || StringUtils.equalsIgnoreCase(arg, "del")) {
+            action = Action.DELETE;
+        } else if (StringUtils.equalsIgnoreCase(arg, "check") || StringUtils.equalsIgnoreCase(arg, "che")) {
+            action = Action.CHECK;
+        } else {
+            System.out.println("wrong action name for argument[1]");
+            System.out.println(">> ins[ert], che[ck], del[ete] are available");
+            return true;
+        }
+        return false;
+    }
+
     public static boolean isInsertAction() {
         return action == Action.INSERT;
     }
