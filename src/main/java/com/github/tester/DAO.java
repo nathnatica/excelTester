@@ -3,6 +3,7 @@ package com.github.tester;
 import com.github.tester.model.RecordEntity;
 import com.github.tester.model.TableEntity;
 import com.github.tester.sql.ISql;
+import com.github.tester.util.ResourceBundleUtil;
 import com.github.tester.validator.Argument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +18,9 @@ public class DAO {
     final static Logger logger = LoggerFactory.getLogger(DAO.class);
 
     private static final String DB_DRIVER = PropertyUtil.getProperty("db.driver");
-    private static final String DB_CONNECTION = PropertyUtil.getProperty("db.connection");
-    private static final String DB_USER = PropertyUtil.getProperty("db.user");
-    private static final String DB_PASSWORD = PropertyUtil.getProperty("db.password");
+    private static final String DB_CONNECTION = ResourceBundleUtil.get("db.connection");
+    private static final String DB_USER = ResourceBundleUtil.get("db.user");
+    private static final String DB_PASSWORD = ResourceBundleUtil.get("db.password");
 
     public boolean execute(List<TableEntity> tables, Argument.Action action) {
         

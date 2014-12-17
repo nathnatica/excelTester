@@ -2,6 +2,7 @@ package com.github.tester;
 
 import com.github.tester.model.TableEntity;
 import com.github.tester.util.ExcelUtil;
+import com.github.tester.util.ResourceBundleUtil;
 import com.github.tester.util.TimeUtil;
 import com.github.tester.validator.Argument;
 import com.github.tester.validator.InputData;
@@ -34,6 +35,8 @@ public class TestRunner {
         } else {
              file = args[0];
         }
+        
+        ResourceBundleUtil.init("app");
         
         setLog(file);
 

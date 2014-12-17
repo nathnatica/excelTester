@@ -2,6 +2,7 @@ package com.github.tester;
 
 import com.github.tester.model.TableDefEntity;
 import com.github.tester.util.ExcelUtil;
+import com.github.tester.util.ResourceBundleUtil;
 import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,10 +22,10 @@ public class TableDefinitionLoader {
     
     public static void loadTableDef() throws Exception {
         if (isAvailable() && tableDef == null) {
-            String file = PropertyUtil.getProperty("table.def.file.path");
+            String file = ResourceBundleUtil.get("table.def.file.path");
             Workbook wb = ExcelUtil.getWorkbook(file);
 
-            Sheet sheet = wb.getSheet(PropertyUtil.getProperty("table.def.sheet.name"));
+            Sheet sheet = wb.getSheet(ResourceBundleUtil.get("table.def.sheet.name"));
 
             tableDef = new HashMap<String, TableDefEntity>();
 
@@ -56,19 +57,19 @@ public class TableDefinitionLoader {
     }
 
     private static void checkTableDefHeader(String tableName, String columnName, String typeName, String pkName) throws Exception {
-        if (!StringUtils.contains(tableName, PropertyUtil.getProperty("table.def.sheet.index.table.name"))) {
+        if (!StringUtils.contains(tableName, ResourceBundleUtil.get("table.def.sheet.index.table.name"))) {
             logger.error("wrong table definition file couldn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.table.name"));
             throw new Exception();
         }
-        if (!StringUtils.contains(columnName, PropertyUtil.getProperty("table.def.sheet.index.column.name"))) {
+        if (!StringUtils.contains(columnName, ResourceBundleUtil.get("table.def.sheet.index.column.name"))) {
             logger.error("wrong table definition file couldn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.column.name"));
             throw new Exception();
         }
-        if (!StringUtils.contains(typeName, PropertyUtil.getProperty("table.def.sheet.index.type.name"))) {
+        if (!StringUtils.contains(typeName, ResourceBundleUtil.get("table.def.sheet.index.type.name"))) {
             logger.error("wrong table definition file couldn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.type.name"));
             throw new Exception();
         }
-        if (!StringUtils.contains(pkName, PropertyUtil.getProperty("table.def.sheet.index.pk.name"))) {
+        if (!StringUtils.contains(pkName, ResourceBundleUtil.get("table.def.sheet.index.pk.name"))) {
             logger.error("wrong table definition file couldn't find column name contains [{}]", PropertyUtil.getProperty("table.def.sheet.index.pk.name"));
             throw new Exception();
         }
