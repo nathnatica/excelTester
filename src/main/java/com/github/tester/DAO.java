@@ -22,11 +22,11 @@ public class DAO {
     private static final String DB_USER = ResourceBundleUtil.get("db.user");
     private static final String DB_PASSWORD = ResourceBundleUtil.get("db.password");
 
+    Connection conn = getDBConnection();
+    
     public boolean execute(List<TableEntity> tables, Argument.Action action) {
         
         SqlFactory sqlFactory = (SqlFactory) BeanConfigurator.getBean("sqlMaker"); 
-        
-        Connection conn = getDBConnection();
 
         try {
             conn.setAutoCommit(false);
@@ -35,8 +35,6 @@ public class DAO {
                 ISql sqlObject = sqlFactory.getSqlFor(action);
                 executeTableSqls(conn, table, sqlObject);                
             }
-            conn.commit();
-            logger.info("commited");
             return true;
         } catch (SQLException e) {
             logger.debug(e.getMessage());
@@ -56,6 +54,17 @@ public class DAO {
                 e1.printStackTrace();
             }
             return false;
+        }
+    }
+    
+    public void commit(boolean result) {
+        try {
+            if (result) {
+                conn.commit();
+                logger.info("commited");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         } finally {
             if (conn!= null) {
                 try {

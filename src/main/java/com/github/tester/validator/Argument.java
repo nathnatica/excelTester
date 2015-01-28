@@ -25,8 +25,8 @@ public class Argument {
         public int getEnd() {
             return end;
         }
-        public int getCurrent() {
-            return current;    
+        public String getCurrent() {
+            return StringUtils.leftPad(String.valueOf(current), 5, '0');    
         }
         public void setCurrent(int cur) {
             current = cur;
