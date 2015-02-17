@@ -41,7 +41,8 @@ public class RawColumnType implements IColumnType {
 
     @Override
     public void fillDeleteSql(PreparedStatement preparedStatement, int index, String value) throws Exception {
-        throw new Exception("wrong column type");
+        preparedStatement.setString(index, value);
+//        throw new Exception("wrong column type");
     }
 
     @Override
