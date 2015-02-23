@@ -53,6 +53,9 @@ public class TestRunner {
             if (!InputData.isValid(tables)) return;
 
             result = dao.execute(tables, Argument.action);
+            if (!result) {
+                break;
+            }
 
             if (Argument.isCheckAction()) {
                 InputData.check(tables);
@@ -71,9 +74,15 @@ public class TestRunner {
             logger.info("##############################################");
             logger.info("####### {} work ended", Argument.action.getValue());
             logger.info("##############################################");
+            if (StringUtils.equals(args[0], "gui")) {
+                JOptionPane.showMessageDialog(null, Argument.action.getValue(), "Success", JOptionPane.INFORMATION_MESSAGE);
+            }
         } else {
             logger.error(">>>>> ERROR <<<<<");
             logger.error(">>>>> TestRunner ended with Errors, check the log file");
+            if (StringUtils.equals(args[0], "gui")) {
+                JOptionPane.showMessageDialog(null, Argument.action.getValue(), "Fail", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
